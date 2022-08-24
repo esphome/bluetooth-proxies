@@ -1,0 +1,35 @@
+substitutions:
+  name: bluetooth-proxy
+
+esphome:
+  name: ${name}
+  name_add_mac_suffix: true
+  project:
+    name: esphome.bluetooth-proxy
+    version: "1.0"
+
+esp32:
+  board: esp32-poe-iso
+  framework:
+    type: arduino
+
+ethernet:
+  type: LAN8720
+  mdc_pin: GPIO23
+  mdio_pin: GPIO18
+  clk_mode: GPIO17_OUT
+  phy_addr: 0
+  power_pin: GPIO12
+
+api:
+logger:
+ota:
+
+dashboard_import:
+  package_import_url: github://esphome/bluetooth-proxies/olimex-esp32-poe-iso.yaml@main
+
+esp32_ble_tracker:
+  scan_parameters:
+    active: true
+
+bluetooth_proxy:

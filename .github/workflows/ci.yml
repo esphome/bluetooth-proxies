@@ -12,6 +12,7 @@ jobs:
         file:
           - m5stack-atom-lite.yaml
           - esp32-generic.yaml
+          - olimex-esp32-poe-iso.yaml
     steps:
       - name: Checkout source code
         uses: actions/checkout@v2

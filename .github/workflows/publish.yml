@@ -25,3 +25,13 @@ jobs:
       manifest_filename: esp32-generic-manifest.json
       clean: false
       esphome_version: dev
+
+  publish-olimex-esp32-poe-iso:
+    name: Publish Olimex PoE ISO
+    uses: esphome/workflows/.github/workflows/publish.yml@main
+    with:
+      files: olimex-esp32-poe-iso.yaml
+      name: Olimex PoE ISO
+      manifest_filename: olimex-esp32-poe-iso-manifest.json
+      clean: false
+      esphome_version: dev
