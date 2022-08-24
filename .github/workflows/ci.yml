@@ -10,15 +10,13 @@ jobs:
     strategy:
       matrix:
         file:
-          - m5stack-atom-echo.yaml
-          - m5stack-atom-speaker-kit.yaml
-          - raspiaudio-muse-proto.yaml
-          - raspiaudio-muse-luxe.yaml
+          - m5stack-atom-lite.yaml
+          - esp32-generic.yaml
     steps:
       - name: Checkout source code
         uses: actions/checkout@v2
       - name: Build ESPHome firmware to verify configuration
-        uses: esphome/build-action@v1.5.1
+        uses: esphome/build-action@v1.5.2
         with:
           yaml_file: ${{ matrix.file }}
-          version: beta
+          version: dev
