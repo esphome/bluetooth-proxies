@@ -1,5 +1,5 @@
 substitutions:
-  name: ESPHome Bluetooth Proxy
+  name: bluetooth-proxy
   wifi_ap_password: ""
 
 esphome:
