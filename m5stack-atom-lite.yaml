@@ -1,0 +1,34 @@
+substitutions:
+  name: ESPHome Bluetooth Proxy
+  wifi_ap_password: ""
+
+esphome:
+  name: ${name}
+  name_add_mac_suffix: true
+  project:
+    name: esphome.bluetooth-proxy
+    version: "1.0"
+
+esp32:
+  board: m5stack-atom
+  framework:
+    type: arduino
+
+wifi:
+  ap:
+    password: ${wifi_ap_password}
+
+api:
+logger:
+ota:
+improv_serial:
+captive_portal:
+
+dashboard_import:
+  package_import_url: github://esphome/bluetooth-proxies/esp32-generic.yaml@main
+
+esp32_ble_tracker:
+  scan_parameters:
+    active: true
+
+bluetooth_proxy:

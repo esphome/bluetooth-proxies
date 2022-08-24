@@ -6,42 +6,22 @@ on:
       - main
 
 jobs:
-  publish-m5stack-atom-echo:
-    name: Publish M5Stack Atom Echo
+  publish-m5stack-atom-lite:
+    name: Publish M5Stack Atom Lite
     uses: esphome/workflows/.github/workflows/publish.yml@main
     with:
-      files: m5stack-atom-echo.yaml
-      name: M5 Stack Atom Echo
-      manifest_filename: m5stack-atom-echo-manifest.json
+      files: m5stack-atom-lite.yaml
+      name: M5 Stack Atom Lite
+      manifest_filename: m5stack-atom-lite-manifest.json
       clean: false
-      esphome_version: beta
+      esphome_version: dev
 
-  publish-m5stack-atom-speaker-kit:
-    name: Publish M5Stack Atom Speaker Kit
+  publish-esp32-generic:
+    name: Publish ESP32 Generic
     uses: esphome/workflows/.github/workflows/publish.yml@main
     with:
-      files: m5stack-atom-speaker-kit.yaml
-      name: M5 Stack Atom Speaker Kit
-      manifest_filename: m5stack-atom-speaker-kit-manifest.json
+      files: esp32-generic.yaml
+      name: ESP32 Generic
+      manifest_filename: esp32-generic-manifest.json
       clean: false
-      esphome_version: beta
-
-  publish-raspiaudio-muse-proto:
-    name: Publish Raspiaudio Muse Proto
-    uses: esphome/workflows/.github/workflows/publish.yml@main
-    with:
-      files: raspiaudio-muse-proto.yaml
-      name: Raspiaudio Muse Proto
-      manifest_filename: raspiaudio-muse-proto-manifest.json
-      clean: false
-      esphome_version: beta
-
-  publish-raspiaudio-muse-luxe:
-    name: Publish Raspiaudio Muse Luxe
-    uses: esphome/workflows/.github/workflows/publish.yml@main
-    with:
-      files: raspiaudio-muse-luxe.yaml
-      name: Raspiaudio Muse Luxe
-      manifest_filename: raspiaudio-muse-luxe-manifest.json
-      clean: false
-      esphome_version: beta
+      esphome_version: dev
