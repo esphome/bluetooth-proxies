@@ -25,7 +25,7 @@ improv_serial:
 captive_portal:
 
 dashboard_import:
-  package_import_url: github://esphome/bluetooth-proxies/esp32-generic.yaml@main
+  package_import_url: github://esphome/bluetooth-proxies/m5stack-atom-lite.yaml@main
 
 esp32_ble_tracker:
   scan_parameters:
