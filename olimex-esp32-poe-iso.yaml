@@ -1,5 +1,5 @@
 substitutions:
-  name: bluetooth-proxy
+  name: olimex-bluetooth-proxy
 
 esphome:
   name: ${name}

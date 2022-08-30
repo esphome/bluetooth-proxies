@@ -1,5 +1,5 @@
 substitutions:
-  name: bluetooth-proxy
+  name: esp32-bluetooth-proxy
   wifi_ap_password: ""
 
 esphome:
