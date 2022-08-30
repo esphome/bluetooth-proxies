@@ -1,5 +1,5 @@
 substitutions:
-  name: m5stack-atom-bluetooth-proxy
+  name: atom-bluetooth-proxy
   wifi_ap_password: ""
 
 esphome:
