@@ -15,7 +15,7 @@ jobs:
           - olimex-esp32-poe-iso.yaml
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Build ESPHome firmware to verify configuration
         uses: esphome/build-action@v1.5.2
         with:
