@@ -1,0 +1,42 @@
+substitutions:
+  name: wt32-eth01-bluetooth-proxy
+
+esphome:
+  name: ${name}
+  name_add_mac_suffix: true
+  project:
+    name: esphome.bluetooth-proxy
+    version: "1.0"
+
+esp32:
+  board: esp32doit-devkit-v1
+  framework:
+    type: arduino
+
+ethernet:
+  type: LAN8720
+  mdc_pin: GPIO23
+  mdio_pin: GPIO18
+  clk_mode: GPIO0_IN
+  phy_addr: 1
+  power_pin: GPIO16
+
+api:
+logger:
+ota:
+
+dashboard_import:
+  package_import_url: github://esphome/bluetooth-proxies/wt32-eth01-esp32-poe-iso.yaml@main
+
+esp32_ble_tracker:
+  scan_parameters:
+    interval: 300ms
+    window: 300ms
+    active: true
+
+bluetooth_proxy:
+
+button:
+- platform: safe_mode
+  name: Safe Mode Boot
+  entity_category: diagnostic
