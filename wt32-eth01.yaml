@@ -1,5 +1,5 @@
 substitutions:
-  name: wt32-eth01-bluetooth-proxy
+  name: wt32-eth01-bt-proxy
 
 esphome:
   name: ${name}
