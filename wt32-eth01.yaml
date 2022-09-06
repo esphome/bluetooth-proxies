@@ -1,5 +1,5 @@
 substitutions:
-  name: olimex-bluetooth-proxy
+  name: wt32-eth01-bluetooth-proxy
 
 esphome:
   name: ${name}
@@ -9,7 +9,7 @@ esphome:
     version: "1.0"
 
 esp32:
-  board: esp32-poe-iso
+  board: esp32doit-devkit-v1
   framework:
     type: arduino
 
@@ -17,16 +17,16 @@ ethernet:
   type: LAN8720
   mdc_pin: GPIO23
   mdio_pin: GPIO18
-  clk_mode: GPIO17_OUT
-  phy_addr: 0
-  power_pin: GPIO12
+  clk_mode: GPIO0_IN
+  phy_addr: 1
+  power_pin: GPIO16
 
 api:
 logger:
 ota:
 
 dashboard_import:
-  package_import_url: github://esphome/bluetooth-proxies/olimex-esp32-poe-iso.yaml@main
+  package_import_url: github://esphome/bluetooth-proxies/wt32-eth01.yaml@main
 
 esp32_ble_tracker:
   scan_parameters:
