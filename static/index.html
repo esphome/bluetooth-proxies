@@ -31,14 +31,8 @@
       a {
         color: #03a9f4;
       }
-      .invisible {
-        visibility: hidden;
-      }
       .hidden {
         display: none;
-      }
-      esp-web-install-button[install-unsupported] {
-        visibility: inherit;
       }
       .content pre {
         max-width: 100%;
@@ -101,12 +95,11 @@
           color: #58a6ff;
         }
       }
-      /* Remove this once we add a fifth media player
       @media only screen and (min-height: 1000px) {
         .radios label {
           max-width: initial;
         }
-      } */
+      }
     </style>
     <script
       type="module"
@@ -146,15 +139,12 @@
         </label>
         <label>
           <input type="radio" name="type" value="wt32-eth01" />
-          <img
-            src="./wt32-eth01.png"
-            alt="Wireless-Tag WT32-ETH01"
-          />
+          <img src="./wt32-eth01.png" alt="Wireless-Tag WT32-ETH01" />
         </label>
       </div>
 
       <p class="button-row" align="center">
-        <esp-web-install-button class="invisible"></esp-web-install-button>
+        <esp-web-install-button></esp-web-install-button>
       </p>
 
       <div class="info esp32-generic">
@@ -197,9 +187,9 @@
       <div class="hidden info olimex-esp32-poe-iso">
         <h3>Olimex ESP32 Power-over-Ethernet ISO</h3>
         <p>
-          ESP32 board with wired Ethernet connection that can also be powered 
-          using Power over Ethernet 802.3af. Note that when installed via this 
-          website, Wi-Fi is disabled and it requires an Ethernet connection for 
+          ESP32 board with wired Ethernet connection that can also be powered
+          using Power over Ethernet 802.3af. Note that when installed via this
+          website, Wi-Fi is disabled and it requires an Ethernet connection for
           further operation.
           <a href="https://www.thingiverse.com/thing:3857281"
             >Case on Thingiverse.</a
@@ -225,9 +215,9 @@
       <div class="hidden info wt32-eth01">
         <h3>Wireless-Tag WT32-ETH01</h3>
         <p>
-          ESP32 board with wired Ethernet connection. Note that when installed 
-          via this website, Wi-Fi is disabled and it requires an Ethernet connection 
-          for further operation.
+          ESP32 board with wired Ethernet connection. Note that when installed
+          via this website, Wi-Fi is disabled and it requires an Ethernet
+          connection for further operation.
           <a href="https://www.thingiverse.com/search?q=WT32-ETH01"
             >Various enclosures on Thingiverse.</a
           >
@@ -235,8 +225,7 @@
         <p>Buy</p>
         <ul>
           <li>
-            <a
-              href="https://www.aliexpress.com/wholesale?SearchText=WT32-ETH01"
+            <a href="https://www.aliexpress.com/wholesale?SearchText=WT32-ETH01"
               >AliExpress</a
             >
           </li>
@@ -282,7 +271,6 @@
         radio.addEventListener("change", () => {
           const button = document.querySelector("esp-web-install-button");
           button.manifest = `./${radio.value}-manifest.json`;
-          button.classList.remove("invisible");
 
           document.querySelectorAll(".info").forEach((info) => {
             info.classList.add("hidden");
