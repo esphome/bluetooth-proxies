@@ -32,8 +32,9 @@ esp32_ble_tracker:
   scan_parameters:
     interval: 1100ms
     window: 1100ms
-    active: true
-
+    active: true # to minimize RF pollution and save some battery you can set this 
+                 # to false if your sensors send advertisment packets by themselves
+                 # and don't require active queries to send data
 bluetooth_proxy:
 
 button:
