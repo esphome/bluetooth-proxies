@@ -35,3 +35,16 @@ jobs:
       manifest_filename: olimex-esp32-poe-iso-manifest.json
       clean: false
       esphome_version: dev
+
+  publish-wt32-eth01:
+    name: Publish Wireless-Tag WT32-ETH01
+    uses: esphome/workflows/.github/workflows/publish.yml@main
+    with:
+      files: wt32-eth01.yaml
+      name: Wireless-Tag WT32-ETH01
+      manifest_filename: wt32-eth01-manifest.json
+      clean: false
+      esphome_version: dev
+
+
+
