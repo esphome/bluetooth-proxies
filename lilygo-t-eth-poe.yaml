@@ -8,8 +8,10 @@ esphome:
     name: esphome.bluetooth-proxy
     version: "1.0"
 
-  # See: https://github.com/Xinyuan-LilyGO/LilyGO-T-ETH-POE
 esp32:
+  # Platform.io does not have an explicit profile for the module.
+  # We can treat it like a standard dev board based around a standard WROOM module
+  # See: https://github.com/Xinyuan-LilyGO/LilyGO-T-ETH-POE
   board: esp32dev
   framework:
     type: arduino
