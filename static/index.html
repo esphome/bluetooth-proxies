@@ -173,7 +173,7 @@
         <esp-web-install-button></esp-web-install-button>
       </p>
 
-      <div class="info esp32-generic">
+      <div class="hidden info esp32-generic">
         <h3>Generic ESP32</h3>
         <p>
           Turn any ESP32 into a Bluetooth proxy for Home Assistant. This option
@@ -308,6 +308,9 @@
             .classList.remove("hidden");
         })
       );
+      document
+        .querySelector('input[name="type"]:checked')
+        .dispatchEvent(new Event("change"));
     </script>
   </body>
 </html>
