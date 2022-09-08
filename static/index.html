@@ -5,10 +5,37 @@
     <title>ESPHome Bluetooth Proxy</title>
     <meta
       name="description"
-      content="Ready-made firmware to turn devices into ESPHome Bluetooth proxies for Home Assistant.."
+      content="Expand the Bluetooth range of your smart home using ESPHome devices."
     />
     <meta name="viewport" content="width=device-width" />
     <meta name="color-scheme" content="dark light" />
+    <meta property="og:title" content="ESPHome Bluetooth Proxies" />
+    <meta property="og:site_name" content="ESPHome Bluetooth Proxies" />
+    <meta
+      property="og:url"
+      content="https://esphome.github.io/bluetooth-proxies/"
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:description"
+      content="Expand the Bluetooth range of your smart home using ESPHome devices."
+    />
+    <meta
+      property="og:image"
+      content="https://esphome.github.io/bluetooth-proxies/header.png"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@esphome_" />
+    <meta name="twitter:title" content="ESPHome Bluetooth Proxies" />
+    <meta
+      name="twitter:description"
+      content="Expand the Bluetooth range of your smart home using ESPHome devices."
+    />
+    <meta
+      name="twitter:image"
+      content="https://esphome.github.io/bluetooth-proxies/header.png"
+    />
+
     <style>
       body {
         font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI",
@@ -22,8 +49,10 @@
         margin: 0 auto;
         padding: 12px;
       }
-      h2 {
-        margin-top: 2em;
+      .header {
+        display: block;
+        width: 100%;
+        aspect-ratio: 1200 / 675;
       }
       h3 {
         margin-top: 1.5em;
@@ -33,10 +62,6 @@
       }
       .hidden {
         display: none;
-      }
-      .content pre {
-        max-width: 100%;
-        overflow-y: scroll;
       }
       li {
         padding: 4px 0;
@@ -51,13 +76,6 @@
         font-style: italic;
         margin-top: 16px;
       }
-      table {
-        border-spacing: 0;
-      }
-      td {
-        padding: 8px;
-        border-bottom: 1px solid #ccc;
-      }
       .radios {
         display: flex;
         flex-direction: row;
@@ -67,7 +85,7 @@
       .radios label {
         padding: 4px;
         cursor: pointer;
-        width: calc(50% - 16px);
+        width: calc(25% - 16px);
         max-width: 184px;
         display: block;
         position: relative;
@@ -95,8 +113,9 @@
           color: #58a6ff;
         }
       }
-      @media only screen and (min-height: 1000px) {
+      @media only screen and (max-width: 450px) {
         .radios label {
+          width: calc(50% - 16px);
           max-width: initial;
         }
       }
@@ -108,13 +127,19 @@
   </head>
   <body>
     <div class="content">
+      <img
+        class="header"
+        src="./header.png"
+        alt="Diagram showing how Bluetooth proxies extend the Bluetooth range of Home Assistant."
+      />
       <h1>ESPHome Bluetooth Proxies</h1>
       <p></p>
       <p>
         Bluetooth technology has a limited range.
         <a href="https://www.home-assistant.io">Home Assistant</a> can expand
-        it's Bluetooth reach by communicating through Bluetooth proxy devices
-        powered by <a href="https://esphome.io">ESPHome</a>.
+        it's Bluetooth reach by communicating with Bluetooth devices through
+        Bluetooth proxy devices powered by
+        <a href="https://esphome.io">ESPHome</a>.
       </p>
       <p>
         Pick your product to turn it into a Bluetooth proxy for Home Assistant.
@@ -189,9 +214,9 @@
         <p>
           ESP32 board with wired Ethernet connection that can also be powered
           using Power over Ethernet 802.3af. Note that when installed via this
-          website, Wi-Fi is disabled and it requires an Ethernet connection for
-          further operation. The <i>ESP32-POE-ISO-EA</i> variant may provide
-          better Bluetooth range since it has an external antennae.
+          website, Wi-Fi is disabled and it needs to be connected via Ethernet.
+          The <i>ESP32-POE-ISO-EA</i> variant may provide better Bluetooth range
+          since it has an external antennae.
 
           <a href="https://www.thingiverse.com/thing:3857281"
             >Case on Thingiverse.</a
@@ -218,8 +243,8 @@
         <h3>Wireless-Tag WT32-ETH01</h3>
         <p>
           ESP32 board with wired Ethernet connection. Note that when installed
-          via this website, Wi-Fi is disabled and it requires an Ethernet
-          connection for further operation.
+          via this website, Wi-Fi is disabled and it needs to be connected via
+          Ethernet.
           <a href="https://www.thingiverse.com/search?q=WT32-ETH01"
             >Various enclosures on Thingiverse.</a
           >
