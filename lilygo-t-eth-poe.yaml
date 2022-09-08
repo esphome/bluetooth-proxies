@@ -10,12 +10,13 @@ esphome:
 
 esp32:
   # Platform.io does not have an explicit profile for the module.
-  # We can treat it like a standard dev board based around a standard WROOM module
+  # We can treat it like a standard dev board based around a standard WROOM module.
   # See: https://github.com/Xinyuan-LilyGO/LilyGO-T-ETH-POE
   board: esp32dev
   framework:
     type: arduino
 
+# See: https://esphome.io/components/ethernet.html#configuration-for-lilygo-ttgo-t-internet-poe-esp32-wroom-lan8270a-chip
 ethernet:
   type: LAN8720
   mdc_pin: GPIO23
