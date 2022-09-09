@@ -56,4 +56,12 @@ jobs:
       clean: false
       esphome_version: dev
 
-
+  publish-lilygo-t-eth-poe:
+    name: Publish LilyGO T-ETH-POE ESP32-WROOM
+    uses: esphome/workflows/.github/workflows/publish.yml@main
+    with:
+      files: lilygo-t-eth-poe.yaml
+      name: LilyGO T-ETH-POE
+      manifest_filename: lilygo-t-eth-poe-manifest.json
+      clean: false
+      esphome_version: dev
