@@ -1,0 +1,44 @@
+substitutions:
+  name: "lilygo-ttgo-poe-bt-proxy"
+
+esphome:
+  name: "${name}"
+  name_add_mac_suffix: true
+  project:
+    name: esphome.bluetooth-proxy
+    version: "1.0"
+
+esp32:
+  # Platform.io does not have an explicit profile for the module.
+  # We can treat it like a standard dev board based around a standard WROOM module.
+  # See: https://github.com/Xinyuan-LilyGO/LilyGO-T-ETH-POE
+  board: esp32dev
+  framework:
+    type: arduino
+
+# See: https://esphome.io/components/ethernet.html#configuration-for-lilygo-ttgo-t-internet-poe-esp32-wroom-lan8270a-chip
+ethernet:
+  type: LAN8720
+  mdc_pin: GPIO23
+  mdio_pin: GPIO18
+  clk_mode: GPIO17_OUT
+  phy_addr: 0
+
+api:
+logger:
+ota:
+
+dashboard_import:
+  package_import_url: github://esphome/bluetooth-proxies/lilygo-t-eth-poe.yaml@main
+
+esp32_ble_tracker:
+  scan_parameters:
+    interval: 1100ms
+    window: 1100ms
+    active: true
+
+bluetooth_proxy:
+button:
+  - platform: safe_mode
+    name: Safe Mode Boot
+    entity_category: diagnostic
