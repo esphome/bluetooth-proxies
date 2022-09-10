@@ -1,7 +1,7 @@
+# Instructions on opening and wiring for flashing on https://blakadder.com/gl-s10.html
+
 substitutions:
   name: gl-s10-bt-proxy
-
-# more details on https://blakadder.com/gl-s10.html
 
 esphome:
   name: ${name}
