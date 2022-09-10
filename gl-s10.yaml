@@ -1,4 +1,4 @@
-# Instructions on opening and wiring for flashing on https://blakadder.com/gl-s10.html
+# Instructions on opening and wiring for flashing on https://blakadder.com/gl-s10
 
 substitutions:
   name: gl-s10-bt-proxy
@@ -31,7 +31,7 @@ logger:
 ota:
 
 dashboard_import:
-  package_import_url: github://blakadder/bluetooth-proxies/gl-s10.yaml@main
+  package_import_url: github://esphome/bluetooth-proxies/gl-s10.yaml@main
 
 esp32_ble_tracker:
   scan_parameters:
