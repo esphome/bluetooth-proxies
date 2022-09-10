@@ -46,5 +46,14 @@ jobs:
       clean: false
       esphome_version: dev
 
+  publish-gl-s10:
+    name: Publish GL.iNet GL-S10
+    uses: esphome/workflows/.github/workflows/publish.yml@main
+    with:
+      files: gl-s10.yaml
+      name: GL.iNet GL-S10
+      manifest_filename: gl-s10-manifest.json
+      clean: false
+      esphome_version: dev
 
 

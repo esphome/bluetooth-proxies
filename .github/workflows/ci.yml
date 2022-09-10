@@ -14,6 +14,7 @@ jobs:
           - esp32-generic.yaml
           - olimex-esp32-poe-iso.yaml
           - wt32-eth01.yaml
+          - gl-s10.yaml
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
