@@ -119,6 +119,23 @@
           max-width: initial;
         }
       }
+      .diy::after {
+        content: "DIY";
+        background-color: #f44336;
+        color: #fff;
+        padding: 2px 4px;
+        border-radius: 4px;
+        font-size: 0.8em;
+        position: absolute;
+        bottom: 12px;
+        left: 12px;
+      }
+      body .diy {
+        display: none;
+      }
+      body.show-diy .diy {
+        display: initial;
+      }
     </style>
     <script
       type="module"
@@ -155,13 +172,6 @@
           <input type="radio" name="type" value="m5stack-atom-lite" />
           <img src="./m5stack_atom_lite.png" alt="M5Stack Atom Lite" />
         </label>
-        <!--
-          Requires DIY
-          <label>
-            <input type="radio" name="type" value="gl-s10" />
-            <img src="./gl-s10.png" alt="GL.iNet GL-S10" />
-          </label>
-        -->
         <label>
           <input type="radio" name="type" value="olimex-esp32-poe-iso" />
           <img
@@ -169,20 +179,18 @@
             alt="Olimex ESP32 Power-over-Ethernet ISO"
           />
         </label>
-        <!--
-          Requires DIY
-          <label>
-            <input type="radio" name="type" value="wt32-eth01" />
-            <img src="./wt32-eth01.png" alt="Wireless-Tag WT32-ETH01" />
-          </label>
-        -->
-        <!--
-          Requires DIY
-          <label>
-            <input type="radio" name="type" value="lilygo-t-eth-poe" />
-            <img src="./lilygo-eth-poe.png" alt="LilyGO T-ETH-POE" />
-          </label>
-        -->
+        <label class="diy">
+          <input type="radio" name="type" value="lilygo-t-eth-poe" />
+          <img src="./lilygo-eth-poe.png" alt="LilyGO T-ETH-POE" />
+        </label>
+        <label class="diy">
+          <input type="radio" name="type" value="gl-s10" />
+          <img src="./gl-s10.png" alt="GL.iNet GL-S10" />
+        </label>
+        <label class="diy">
+          <input type="radio" name="type" value="wt32-eth01" />
+          <img src="./wt32-eth01.png" alt="Wireless-Tag WT32-ETH01" />
+        </label>
       </div>
 
       <p class="button-row" align="center">
@@ -213,6 +221,12 @@
           that can also be powered using Power over Ethernet 802.3af. Note that
           when installed via this website, Wi-Fi is disabled and it needs to be
           connected via Ethernet.
+        </p>
+        <p>
+          <b>Warning: This board requires extra work.</b>
+          This device requires you to disassemble the device to be able to
+          install it as a Bluetooth proxy.
+          <a href="https://blakadder.com/gl-s10/">Read DIY instructions.</a>
         </p>
         <p>Buy</p>
         <ul>
@@ -285,6 +299,15 @@
             >Various enclosures on Thingiverse.</a
           >
         </p>
+        <p>
+          <b>Warning: This board requires extra work.</b>
+          This device requires you to create a special flash tool to be able to
+          install it as a Bluetooth proxy.
+          <a
+            href="https://community.home-assistant.io/t/how-i-installed-esphome-on-the-wt32-eth01/359027"
+            >Read DIY instructions.</a
+          >
+        </p>
         <p>Buy</p>
         <ul>
           <li>
@@ -312,17 +335,17 @@
             href="https://www.thingiverse.com/search?q=LILYGO TTGO T-Internet-POE ESP32"
             >Various enclosures on Thingiverse.</a
           >
-          <br /><br />
-          <b>Note:</b> The board can be powered – but not programmed – via the
-          built in USB-C port. You will need to use a standard USB <-> UART
-          programmer or purchase the programmer ('downloader tool') designed for
-          the module for an additional cost (about $3).
+        </p>
+        <p>
+          <b>Warning: This board requires extra work.</b>
+          This device comes with a special "download tool" that needs to be used
+          to install it as a Bluetooth proxy.
         </p>
         <p>Buy</p>
         <ul>
           <li>
             <a
-              href="https://www.aliexpress.com/wholesale?SearchText=LILYGO TTGO T-Internet-POE ESP32"
+              href="https://www.aliexpress.com/item/2255800936677694.html?pdp_ext_f=%7B%22sku_id%22%3A%2210000014557692201%22%7D"
               >AliExpress</a
             >
           </li>
@@ -345,6 +368,7 @@
       </ul>
 
       <div class="footer">
+        DIY Expert? <a href="?diy">Show advanced boards</a> <br /><br />
         Affiliated links are used on this website to support ESPHome
         development. Use Coupon code
         <code>NABUCASA</code> on
@@ -374,6 +398,9 @@
       document
         .querySelector('input[name="type"]:checked')
         .dispatchEvent(new Event("change"));
+      if (new URLSearchParams(document.location.search).has("diy")) {
+        document.body.classList.add("show-diy");
+      }
     </script>
   </body>
 </html>
