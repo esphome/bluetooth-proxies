@@ -9,13 +9,9 @@ esphome:
   project:
     name: esphome.bluetooth-proxy
     version: "1.0"
-# turn on Power LED when esphome boots
-  on_boot:
-    then:
-      - output.turn_on: power_led
 
 esp32:
-  board: esp32doit-devkit-v1
+  board: esp32dev
   framework:
     type: arduino
 
@@ -48,12 +44,6 @@ esp32_ble_tracker:
     interval: 1100ms
     window: 1100ms
     active: true
-# Bluetooth LED blinks when receiving Bluetooth advertising
-  on_ble_advertise:
-    then:
-      - output.turn_on: bluetooth_led
-      - delay: 0.5s
-      - output.turn_off: bluetooth_led
 
 bluetooth_proxy:
 
@@ -76,22 +66,3 @@ binary_sensor:
       number: GPIO33
       inverted: true
     name: "Reset Button"
-
-# output settings for LED's marked Power and Bluetooth
-# power LED use: see code line 12
-# bluetooth LED use: see code line 41
-output:
-  - platform: gpio
-    pin: GPIO14
-    inverted: true
-    id: power_led
-  - platform: gpio
-    pin: GPIO12
-    inverted: true
-    id: bluetooth_led
-
-# since these pins are broken out inside and labeled as I2C pins they're configured here
-i2c:
-  sda: 15
-  scl: 13
-  scan: true
