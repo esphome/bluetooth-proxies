@@ -35,6 +35,7 @@ esp32_ble_tracker:
     active: true
 
 bluetooth_proxy:
+  active: true
 
 button:
 - platform: safe_mode
