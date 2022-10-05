@@ -23,4 +23,4 @@ jobs:
         uses: esphome/build-action@v1.5.2
         with:
           yaml_file: ${{ matrix.file }}
-          version: dev
+          version: latest
