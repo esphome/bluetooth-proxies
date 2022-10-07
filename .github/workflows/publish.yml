@@ -1,6 +1,7 @@
 name: Build and Publish ESPHome firmware and website
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
