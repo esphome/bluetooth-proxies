@@ -41,3 +41,8 @@ button:
 - platform: safe_mode
   name: Safe Mode Boot
   entity_category: diagnostic
+
+status_led:
+  pin:
+    number: GPIO15
+    inverted: true
