@@ -7,6 +7,10 @@ esphome:
   project:
     name: esphome.bluetooth-proxy
     version: "1.0"
+  on_boot:
+    then:
+      - output.turn_on: power_led
+      - output.turn_off: wifi_led
 
 esp32:
   board: esp32dev
@@ -33,6 +37,12 @@ esp32_ble_tracker:
     interval: 1100ms
     window: 1100ms
     active: true
+# Bluetooth LED blinks when receiving Bluetooth advertising
+  on_ble_advertise:
+    then:
+      - output.turn_on: bluetooth_led
+      - delay: 0.5s
+      - output.turn_off: bluetooth_led
 
 bluetooth_proxy:
   active: true
@@ -44,5 +54,19 @@ button:
 
 status_led:
   pin:
-    number: GPIO15
+    number: GPIO4 # LED with network icon
     inverted: true
+
+output:
+  - platform: gpio
+    pin: GPIO16
+    inverted: true
+    id: power_led
+  - platform: gpio
+    pin: GPIO15 
+    inverted: true
+    id: bluetooth_led
+  - platform: gpio
+    pin: GPIO2 # LED with Wifi icon unused
+    inverted: true
+    id: wifi_led

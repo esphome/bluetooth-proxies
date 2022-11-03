@@ -37,6 +37,16 @@ jobs:
       clean: false
       esphome_version: latest
 
+  publish-aithinker-esp32-g:
+    name: Publish Ai-Thinker ESP32-G
+    uses: esphome/workflows/.github/workflows/publish.yml@main
+    with:
+      files: aithinker-esp32-g.yaml
+      name: Ai-Thinker ESP32-G
+      manifest_filename: aithinker-esp32-g-manifest.json
+      clean: false
+      esphome_version: latest
+
   publish-wt32-eth01:
     name: Publish Wireless-Tag WT32-ETH01
     uses: esphome/workflows/.github/workflows/publish.yml@main
