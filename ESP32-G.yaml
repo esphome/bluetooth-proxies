@@ -26,7 +26,7 @@ logger:
 ota:
 
 dashboard_import:
-  package_import_url: github://esphome/bluetooth-proxies/esp32g.yaml@main
+  package_import_url: github://esphome/bluetooth-proxies/ESP32-G.yaml@main
 
 esp32_ble_tracker:
   scan_parameters:
