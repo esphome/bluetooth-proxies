@@ -16,6 +16,7 @@ jobs:
           - wt32-eth01.yaml
           - gl-s10.yaml
           - lilygo-t-eth-poe.yaml
+          - esp32-g.yaml
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
