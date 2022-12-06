@@ -14,7 +14,7 @@ esp32:
   # See: https://github.com/Xinyuan-LilyGO/LilyGO-T-ETH-POE
   board: esp32dev
   framework:
-    type: arduino
+    type: esp-idf
 
 # See: https://esphome.io/components/ethernet.html#configuration-for-lilygo-ttgo-t-internet-poe-esp32-wroom-lan8270a-chip
 ethernet:

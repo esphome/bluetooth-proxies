@@ -17,7 +17,7 @@ esphome:
 esp32:
   board: esp32doit-devkit-v1
   framework:
-    type: arduino
+    type: esp-idf
 
 # Configuration fo V2.3 hardware revision
 ethernet:

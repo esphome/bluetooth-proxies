@@ -11,7 +11,7 @@ esphome:
 esp32:
   board: esp32-poe-iso
   framework:
-    type: arduino
+    type: esp-idf
 
 ethernet:
   type: LAN8720
