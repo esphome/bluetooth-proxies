@@ -22,7 +22,7 @@ api:
 logger:
 ota:
 improv_serial:
-captive_portal:
+# captive_portal:
 
 dashboard_import:
   package_import_url: github://esphome/bluetooth-proxies/m5stack-atom-lite.yaml@main
