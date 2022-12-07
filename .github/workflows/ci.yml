@@ -8,6 +8,7 @@ jobs:
     name: Building ${{ matrix.file }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         file:
           - m5stack-atom-lite.yaml
