@@ -11,7 +11,7 @@ esphome:
 esp32:
   board: esp32doit-devkit-v1
   framework:
-    type: arduino
+    type: esp-idf
 
 ethernet:
   type: LAN8720

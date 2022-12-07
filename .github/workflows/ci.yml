@@ -8,6 +8,7 @@ jobs:
     name: Building ${{ matrix.file }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         file:
           - m5stack-atom-lite.yaml
@@ -23,4 +24,4 @@ jobs:
         uses: esphome/build-action@v1.5.2
         with:
           yaml_file: ${{ matrix.file }}
-          version: latest
+          version: beta

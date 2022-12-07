@@ -12,7 +12,7 @@ esphome:
 esp32:
   board: esp32dev
   framework:
-    type: arduino
+    type: esp-idf
 
 wifi:
   ap:
@@ -22,7 +22,7 @@ api:
 logger:
 ota:
 improv_serial:
-captive_portal:
+# captive_portal:
 
 dashboard_import:
   package_import_url: github://esphome/bluetooth-proxies/esp32-generic.yaml@main
