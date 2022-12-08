@@ -45,7 +45,7 @@ jobs:
       name: Ai-Thinker ESP32-G
       manifest_filename: aithinker-esp32-g-manifest.json
       clean: false
-      esphome_version: latest
+      esphome_version: beta
 
   publish-wt32-eth01:
     name: Publish Wireless-Tag WT32-ETH01
