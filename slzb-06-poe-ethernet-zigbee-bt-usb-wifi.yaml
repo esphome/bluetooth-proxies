@@ -1,0 +1,124 @@
+#Name to be used in sensors IDs
+substitutions:
+  name: "slzb-06-btproxy"
+
+#General ESPHome compilation information
+esphome:
+  name: "${name}"
+  name_add_mac_suffix: true
+  project:
+    name: slzb-06.zigbee-and-bluetooth-proxy
+    version: "1.0"
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+#Ethernet connection information
+ethernet:
+  type: LAN8720
+  mdc_pin: GPIO23
+  mdio_pin: GPIO18
+  clk_mode: GPIO0_IN
+  phy_addr: 1
+  power_pin: GPIO16
+
+#General purpose ESPHome settings
+## Connection to Home Assistant through API is enabled
+api:
+## Logger is enabled
+logger:
+## OTA firmware updates are available
+ota:
+## Accessible portal with control buttons is available
+web_server:
+  port: 80
+
+#ESPHome Bluetooth_proxy settings - allow to use SLZB-06 as Ethernet-Bluetooth adapter
+dashboard_import:
+  package_import_url: github://esphome/bluetooth-proxies/slzb-06-poe-ethernet-zigbee-bt-usb-wifi.yaml@main
+
+esp32_ble_tracker:
+  scan_parameters:
+    interval: 1100ms
+    window: 1100ms
+    active: true
+
+bluetooth_proxy:
+  active: true
+
+button:
+- platform: safe_mode
+  name: Safe Mode Boot
+  entity_category: diagnostic
+
+#CONTROL SETTINGS
+## SLZB-06 upteime information as sensor
+text_sensor:
+  - platform: template
+    name: "SLZB-06 Uptime"
+    lambda: |-
+      uint32_t dur = id(uptime_s).state;
+      int dys = 0;
+      int hrs = 0;
+      int mnts = 0;
+      if (dur > 86399) {
+        dys = trunc(dur / 86400);
+        dur = dur - (dys * 86400);
+      }
+      if (dur > 3599) {
+        hrs = trunc(dur / 3600);
+        dur = dur - (hrs * 3600);
+      }
+      if (dur > 59) {
+        mnts = trunc(dur / 60);
+        dur = dur - (mnts * 60);
+      }
+      char buffer[17];
+      sprintf(buffer, "%ud %02uh %02um %02us", dys, hrs, mnts, dur);
+      return {buffer};
+    icon: mdi:clock-start
+    update_interval: 60s
+
+##Uptime generic sensor
+sensor:
+  - platform: uptime
+    id: uptime_s
+    update_interval: 60s
+
+##Status of physical button - sensor
+binary_sensor:
+  - platform: gpio
+    name: "Physical button status"
+    icon: mdi:toggle-switch
+    id: gpio35btn1
+    pin:
+      number: GPIO35
+      mode:
+        input: true
+      inverted: yes
+
+
+## Switches
+### ESP32 Restart
+switch:
+  - platform: restart
+    name: "Ethernet (ESP32) Restart"
+
+### LEDs swithces
+  - platform: gpio
+    name: "LED - device mode (Blue)"
+    restore_mode: ALWAYS_OFF
+    icon: mdi:toggle-switch
+    id: gpio12LED1
+    pin:
+      number: GPIO12
+
+  - platform: gpio
+    name: "LED - power (Yellow)"
+    restore_mode: ALWAYS_ON
+    icon: mdi:toggle-switch
+    id: gpio14LED2
+    pin:
+      number: GPIO14
