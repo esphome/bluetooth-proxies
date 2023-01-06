@@ -1,0 +1,72 @@
+substitutions:
+  name: esp32g-proxy
+
+esphome:
+  name: ${name}
+  name_add_mac_suffix: true
+  project:
+    name: esphome.bluetooth-proxy
+    version: "1.0"
+  on_boot:
+    then:
+      - output.turn_on: power_led
+      - output.turn_off: wifi_led
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+ethernet:
+  type: LAN8720
+  mdc_pin: GPIO23
+  mdio_pin: GPIO18
+  clk_mode: GPIO17_OUT
+  phy_addr: 1
+  power_pin: GPIO5
+
+api:
+logger:
+ota:
+
+dashboard_import:
+  package_import_url: github://esphome/bluetooth-proxies/aithinker-esp32-g.yaml@main
+
+esp32_ble_tracker:
+  scan_parameters:
+    interval: 1100ms
+    window: 1100ms
+    active: true
+# Bluetooth LED blinks when receiving Bluetooth advertising
+  on_ble_advertise:
+    then:
+      - output.turn_on: bluetooth_led
+      - delay: 0.5s
+      - output.turn_off: bluetooth_led
+
+bluetooth_proxy:
+  active: true
+
+button:
+- platform: safe_mode
+  name: Safe Mode Boot
+  entity_category: diagnostic
+
+status_led:
+  pin:
+    number: GPIO4 # LED with network icon
+    inverted: true
+
+output:
+  - platform: gpio
+    pin: GPIO16
+    inverted: true
+    id: power_led
+  - platform: gpio
+    pin: GPIO15 
+    inverted: true
+    id: bluetooth_led
+  - platform: gpio
+    pin: GPIO2 # LED with Wifi icon unused
+    inverted: true
+    id: wifi_led
