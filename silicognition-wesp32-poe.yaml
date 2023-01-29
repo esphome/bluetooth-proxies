@@ -1,0 +1,37 @@
+substitutions:
+  name: wesp32-bluetooth-proxy
+
+esphome:
+  name: ${name}
+  name_add_mac_suffix: true
+  project:
+    name: esphome.bluetooth-proxy
+    version: "1.0"
+
+esp32:
+  board: wesp32
+  framework:
+    type: arduino
+
+ethernet:
+  type: RTL8201
+  mdc_pin: GPIO16
+  mdio_pin: GPIO17
+  clk_mode: GPIO0_IN
+  phy_addr: 0
+
+api:
+logger:
+ota:
+
+dashboard_import:
+  package_import_url: github://esphome/bluetooth-proxies/olimex-esp32-poe-iso.yaml@main
+
+esp32_ble_tracker:
+  scan_parameters:
+    interval: 1100ms
+    window: 1100ms
+    active: true
+
+bluetooth_proxy:
+  active: true
