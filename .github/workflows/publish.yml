@@ -5,64 +5,89 @@ on:
   push:
     branches:
       - main
+  pull_request:
 
 jobs:
-  publish-m5stack-atom-lite:
-    name: Publish M5Stack Atom Lite
-    uses: esphome/workflows/.github/workflows/publish.yml@main
-    with:
-      files: m5stack-atom-lite.yaml
-      name: M5 Stack Atom Lite
-      manifest_filename: m5stack-atom-lite-manifest.json
-      clean: false
-      esphome_version: latest
+  build:
+    name: Build ${{ matrix.firmware.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        firmware:
+          - file: m5stack-atom-lite.yaml
+            name: M5Stack Atom Lite
+            manifest_filename: m5stack-atom-lite-manifest.json
+          - files: esp32-generic.yaml
+            name: ESP32 Generic
+            manifest_filename: esp32-generic-manifest.json
+          - files: olimex-esp32-poe-iso.yaml
+            name: Olimex PoE ISO
+            manifest_filename: olimex-esp32-poe-iso-manifest.json
+          - files: wt32-eth01.yaml
+            name: Wireless-Tag WT32-ETH01
+            manifest_filename: wt32-eth01-manifest.json
+          - files: gl-s10.yaml
+            name: GL.iNet GL-S10
+            manifest_filename: gl-s10-manifest.json
+          - files: lilygo-t-eth-poe.yaml
+            name: LilyGO T-ETH-POE
+            manifest_filename: lilygo-t-eth-poe-manifest.json
+      fail-fast: false
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3.3.0
+      - name: Build firmware
+        uses: esphome/build-action@v1.8.0
+        id: esphome-build
+        with:
+          yaml_file: ${{ matrix.firmware.file }}
+          version: latest
+      - name: Copy firmware and manifest
+        run: |
+          mkdir output
+          mv ${{ steps.esphome-build.outputs.name }}/* output/
+          jq -s '{"name": "${{ matrix.firmware.name }}", "version": "${{ steps.esphome-build.outputs.esphome-version }}", "home_assistant_domain": "esphome", "new_install_skip_erase": false, "builds":.}' output/*/manifest.json > output/${{ matrix.firmware.manifest_filename }}
 
-  publish-esp32-generic:
-    name: Publish ESP32 Generic
-    uses: esphome/workflows/.github/workflows/publish.yml@main
-    with:
-      files: esp32-generic.yaml
-      name: ESP32 Generic
-      manifest_filename: esp32-generic-manifest.json
-      clean: false
-      esphome_version: latest
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: ${{ matrix.firmware.name }}
+          path: output
 
-  publish-olimex-esp32-poe-iso:
-    name: Publish Olimex PoE ISO
-    uses: esphome/workflows/.github/workflows/publish.yml@main
-    with:
-      files: olimex-esp32-poe-iso.yaml
-      name: Olimex PoE ISO
-      manifest_filename: olimex-esp32-poe-iso-manifest.json
-      clean: false
-      esphome_version: latest
 
-  publish-wt32-eth01:
-    name: Publish Wireless-Tag WT32-ETH01
-    uses: esphome/workflows/.github/workflows/publish.yml@main
-    with:
-      files: wt32-eth01.yaml
-      name: Wireless-Tag WT32-ETH01
-      manifest_filename: wt32-eth01-manifest.json
-      clean: false
-      esphome_version: latest
+  consolidate:
+    if: (github.event_name == 'workflow_dispatch' || github.event_name == 'push') && github.ref == 'refs/heads/main'
+    name: Consolidate firmwares
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+      - name: Download built firmwares
+        uses: actions/download-artifact@v3
+        with:
+          path: output
+      - name: Copy built firmwares
+        run: cp -R static/* output/
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v1.0.7
+        with:
+          path: output
 
-  publish-gl-s10:
-    name: Publish GL.iNet GL-S10
-    uses: esphome/workflows/.github/workflows/publish.yml@main
-    with:
-      files: gl-s10.yaml
-      name: GL.iNet GL-S10
-      manifest_filename: gl-s10-manifest.json
-      clean: false
-      esphome_version: latest
-
-  publish-lilygo-t-eth-poe:
-    name: Publish LilyGO T-ETH-POE ESP32-WROOM
-    uses: esphome/workflows/.github/workflows/publish.yml@main
-    with:
-      files: lilygo-t-eth-poe.yaml
-      name: LilyGO T-ETH-POE
-      manifest_filename: lilygo-t-eth-poe-manifest.json
-      clean: false
-      esphome_version: latest
+  deploy:
+    if: (github.event_name == 'workflow_dispatch' || github.event_name == 'push') && github.ref == 'refs/heads/main'
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: consolidate
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Setup Pages
+        uses: actions/configure-pages@v2
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1.2.3
