@@ -1,4 +1,4 @@
-name: Build and Publish ESPHome firmware and website
+name: Build
 
 on:
   workflow_dispatch:
@@ -17,19 +17,19 @@ jobs:
           - file: m5stack-atom-lite.yaml
             name: M5Stack Atom Lite
             manifest_filename: m5stack-atom-lite-manifest.json
-          - files: esp32-generic.yaml
+          - file: esp32-generic.yaml
             name: ESP32 Generic
             manifest_filename: esp32-generic-manifest.json
-          - files: olimex-esp32-poe-iso.yaml
+          - file: olimex-esp32-poe-iso.yaml
             name: Olimex PoE ISO
             manifest_filename: olimex-esp32-poe-iso-manifest.json
-          - files: wt32-eth01.yaml
+          - file: wt32-eth01.yaml
             name: Wireless-Tag WT32-ETH01
             manifest_filename: wt32-eth01-manifest.json
-          - files: gl-s10.yaml
+          - file: gl-s10.yaml
             name: GL.iNet GL-S10
             manifest_filename: gl-s10-manifest.json
-          - files: lilygo-t-eth-poe.yaml
+          - file: lilygo-t-eth-poe.yaml
             name: LilyGO T-ETH-POE
             manifest_filename: lilygo-t-eth-poe-manifest.json
       fail-fast: false
