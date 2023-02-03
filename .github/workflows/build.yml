@@ -69,6 +69,7 @@ jobs:
           path: firmwares
       - name: Copy files
         run: |-
+          mkdir output
           cp -R static/* output/
           cp -R firmwares/*/* output/
       - name: Upload GitHub Pages artifact
