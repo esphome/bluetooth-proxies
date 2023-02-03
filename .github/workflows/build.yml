@@ -45,8 +45,8 @@ jobs:
       - name: Copy firmware and manifest
         run: |
           mkdir output
-          mv ${{ steps.esphome-build.outputs.name }}/* output/
-          jq -s '{"name": "${{ matrix.firmware.name }}", "version": "${{ steps.esphome-build.outputs.esphome-version }}", "home_assistant_domain": "esphome", "new_install_skip_erase": false, "builds":.}' output/*/manifest.json > output/${{ matrix.firmware.manifest_filename }}
+          mv ${{ steps.esphome-build.outputs.name }}/*.bin output/
+          jq -s '{"name": "${{ matrix.firmware.name }}", "version": "${{ steps.esphome-build.outputs.esphome-version }}", "home_assistant_domain": "esphome", "new_install_skip_erase": false, "builds":.}' ${{ steps.esphome-build.outputs.name }}/manifest.json > output/${{ matrix.firmware.manifest_filename }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3.1.2
