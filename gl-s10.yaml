@@ -2,9 +2,11 @@
 
 substitutions:
   name: gl-s10-bt-proxy
+  friendly_name: Bluetooth Proxy
 
 esphome:
   name: ${name}
+  friendly_name: ${friendly_name}
   name_add_mac_suffix: true
   project:
     name: esphome.bluetooth-proxy
