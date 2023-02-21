@@ -1,9 +1,10 @@
 substitutions:
   name: esp32-bluetooth-proxy
-  wifi_ap_password: ""
+  friendly_name: Bluetooth Proxy
 
 esphome:
   name: ${name}
+  friendly_name: ${friendly_name}
   name_add_mac_suffix: true
   project:
     name: esphome.bluetooth-proxy
@@ -16,13 +17,11 @@ esp32:
 
 wifi:
   ap:
-    password: ${wifi_ap_password}
 
 api:
 logger:
 ota:
 improv_serial:
-# captive_portal:
 
 dashboard_import:
   package_import_url: github://esphome/bluetooth-proxies/esp32-generic.yaml@main
