@@ -29,7 +29,7 @@ dashboard_import:
 esp32_ble_tracker:
   scan_parameters:
     interval: 450ms
-    window: 450ms
+    window: 160ms
     active: true
 
 bluetooth_proxy:
