@@ -21,16 +21,6 @@ esp32:
   framework:
     type: esp-idf
 
-# Configuration fo V2.3 hardware revision
-# ethernet:
-#   type: IP101
-#   mdc_pin: GPIO23
-#   mdio_pin: GPIO18
-#   clk_mode: GPIO17_OUT
-#   phy_addr: 1
-#   power_pin: GPIO5
-
-# Comment the above and use this instead for V1.0 revision of the hardware
 ethernet:
   type: LAN8720
   mdc_pin: GPIO23
