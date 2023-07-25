@@ -50,12 +50,18 @@ esp32_ble_tracker:
     interval: 1100ms
     window: 1100ms
     active: true
+#
+# The LED is disabled for ESPHome 2023.6.0+ since we do not
+# decode the advertising packets on device anymore, and adding
+# the LED blink would force the device to decode the packets
+# just to blink the LED.
+#
 # Bluetooth LED blinks when receiving Bluetooth advertising
-  on_ble_advertise:
-    then:
-      - output.turn_on: bluetooth_led
-      - delay: 0.5s
-      - output.turn_off: bluetooth_led
+#  on_ble_advertise:
+#    then:
+#      - output.turn_on: bluetooth_led
+#      - delay: 0.5s
+#      - output.turn_off: bluetooth_led
 
 bluetooth_proxy:
   active: true
