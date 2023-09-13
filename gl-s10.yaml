@@ -87,8 +87,8 @@ binary_sensor:
     name: "Reset Button"
 
 # output settings for LED's marked Power and Bluetooth
-# power LED use: see code line 12
-# bluetooth LED use: see code line 41
+# power LED use: see code line 15
+# bluetooth LED use: see code line 60
 output:
   - platform: gpio
     pin: GPIO14
