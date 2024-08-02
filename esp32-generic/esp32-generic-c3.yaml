@@ -1,0 +1,46 @@
+esphome:
+  name: esp32-bluetooth-proxy
+  friendly_name: Bluetooth Proxy
+  min_version: 2024.6.0
+  name_add_mac_suffix: true
+  platformio_options:
+    board_build.f_flash: 40000000L
+    board_build.flash_mode: dio
+    board_build.flash_size: 4MB
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: esp-idf
+    sdkconfig_options:
+      CONFIG_BT_BLE_42_FEATURES_SUPPORTED: y
+      CONFIG_BT_BLE_50_FEATURES_SUPPORTED: n
+
+wifi:
+  ap:
+
+api:
+logger:
+
+ota:
+  - platform: esphome
+    id: ota_esphome
+
+esp32_ble_tracker:
+  scan_parameters:
+    # We currently use the defaults to ensure Bluetooth
+    # can co-exist with WiFi In the future we may be able to
+    # enable the built-in coexistence logic in ESP-IDF
+    active: true
+
+bluetooth_proxy:
+  active: true
+
+button:
+  - platform: safe_mode
+    id: button_safe_mode
+    name: Safe Mode Boot
+
+  - platform: factory_reset
+    id: factory_reset_btn
+    name: Factory reset

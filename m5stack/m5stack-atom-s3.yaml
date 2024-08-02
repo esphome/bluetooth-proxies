@@ -1,0 +1,42 @@
+esphome:
+  name: atom-bluetooth-proxy
+  friendly_name: Bluetooth Proxy
+  min_version: 2024.6.0
+  name_add_mac_suffix: true
+
+esp32:
+  board: m5stack-atom-s3
+  variant: esp32s3
+  framework:
+    type: esp-idf
+    version: 5.0.2
+    platform_version: 6.3.2
+
+wifi:
+  ap:
+
+api:
+logger:
+
+ota:
+  - platform: esphome
+    id: ota_esphome
+
+esp32_ble_tracker:
+  scan_parameters:
+    # We currently use the defaults to ensure Bluetooth
+    # can co-exist with WiFi In the future we may be able to
+    # enable the built-in coexistence logic in ESP-IDF
+    active: true
+
+bluetooth_proxy:
+  active: true
+
+button:
+  - platform: safe_mode
+    id: button_safe_mode
+    name: Safe Mode Boot
+
+  - platform: factory_reset
+    id: factory_reset_btn
+    name: Factory reset

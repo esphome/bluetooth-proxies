@@ -1,0 +1,22 @@
+packages:
+  gl-s10: !include gl-s10.yaml
+
+esphome:
+  project:
+    name: esphome.bluetooth-proxy
+    version: dev
+
+ota:
+  - platform: http_request
+    id: ota_http_request
+
+update:
+  - platform: http_request
+    id: update_http_request
+    name: Firmware
+    source: https://firmware.esphome.io/bluetooth-proxy/gl-s10/manifest.json
+
+http_request:
+
+dashboard_import:
+  package_import_url: github://esphome/bluetooth-proxies/gl-inet/gl-s10.yaml@main
