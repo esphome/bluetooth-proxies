@@ -5,7 +5,7 @@ esphome:
   name_add_mac_suffix: true
 
 esp32:
-  board: m5stack-atom-s3
+  board: m5stack-atoms3
   variant: esp32s3
   framework:
     type: esp-idf
