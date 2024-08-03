@@ -16,7 +16,7 @@ concurrency:
 jobs:
   build-generic-firmware:
     name: Build Generic Firmware
-    uses: esphome/workflows/.github/workflows/build.yml@jesserockz-2024-336
+    uses: esphome/workflows/.github/workflows/build.yml@main
     with:
       files: |
         esp32-generic/esp32-generic.factory.yaml
@@ -29,7 +29,7 @@ jobs:
 
   build-device-firmware:
     name: Build Device Firmware
-    uses: esphome/workflows/.github/workflows/build.yml@jesserockz-2024-336
+    uses: esphome/workflows/.github/workflows/build.yml@main
     with:
       files: |
         gl-inet/gl-s10.factory.yaml
@@ -49,7 +49,7 @@ jobs:
     needs:
       - build-generic-firmware
       - build-device-firmware
-    uses: esphome/workflows/.github/workflows/upload.yml@jesserockz-2024-336
+    uses: esphome/workflows/.github/workflows/upload.yml@main
     with:
       name: bluetooth-proxy
       version: ${{ needs.build-device-firmware.outputs.version }}
