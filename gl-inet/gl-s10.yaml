@@ -1,17 +1,10 @@
 # Instructions on opening and wiring for flashing on https://blakadder.com/gl-s10
-
-substitutions:
+esphome:
   name: gl-s10-bt-proxy
   friendly_name: Bluetooth Proxy
-
-esphome:
-  name: ${name}
-  friendly_name: ${friendly_name}
+  min_version: 2024.6.0
   name_add_mac_suffix: true
-  project:
-    name: esphome.bluetooth-proxy
-    version: "1.0"
-# turn on Power LED when esphome boots
+  # turn on Power LED when esphome boots
   on_boot:
     then:
       - output.turn_on: power_led
@@ -41,9 +34,8 @@ ethernet:
 api:
 logger:
 ota:
-
-dashboard_import:
-  package_import_url: github://esphome/bluetooth-proxies/gl-s10.yaml@main
+  - platform: esphome
+    id: ota_esphome
 
 esp32_ble_tracker:
   scan_parameters:
@@ -67,9 +59,13 @@ bluetooth_proxy:
   active: true
 
 button:
-- platform: safe_mode
-  name: Safe Mode Boot
-  entity_category: diagnostic
+  - platform: safe_mode
+    id: button_safe_mode
+    name: Safe Mode Boot
+
+  - platform: factory_reset
+    id: factory_reset_btn
+    name: Factory reset
 
 ## DEVICE SPECIFIC CONFIGURATION
 # network LED (white one) configured as status led
@@ -85,10 +81,11 @@ binary_sensor:
       number: GPIO33
       inverted: true
     name: "Reset Button"
+    id: binary_sensor_reset_button
 
 # output settings for LED's marked Power and Bluetooth
-# power LED use: see code line 12
-# bluetooth LED use: see code line 41
+# power LED use: see code line 15
+# bluetooth LED use: see code line 60
 output:
   - platform: gpio
     pin: GPIO14
@@ -101,6 +98,7 @@ output:
 
 # since these pins are broken out inside and labeled as I2C pins they're configured here
 i2c:
-  sda: 15
-  scl: 13
-  scan: true
+  - id: i2c_bus
+    sda: 15
+    scl: 13
+    scan: true

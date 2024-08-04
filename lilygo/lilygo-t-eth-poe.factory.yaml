@@ -1,0 +1,22 @@
+packages:
+  lilygo-t-eth-poe: !include lilygo-t-eth-poe.yaml
+
+esphome:
+  project:
+    name: esphome.bluetooth-proxy
+    version: dev
+
+ota:
+  - platform: http_request
+    id: ota_http_request
+
+update:
+  - platform: http_request
+    id: update_http_request
+    name: Firmware
+    source: https://firmware.esphome.io/bluetooth-proxy/lilygo-t-eth-poe/manifest.json
+
+http_request:
+
+dashboard_import:
+  package_import_url: github://esphome/bluetooth-proxies/lilygo/lilygo-t-eth-poe.yaml@main

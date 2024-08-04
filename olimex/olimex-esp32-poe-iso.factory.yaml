@@ -1,0 +1,22 @@
+packages:
+  olimex-esp32-poe-iso: !include olimex-esp32-poe-iso.yaml
+
+esphome:
+  project:
+    name: esphome.bluetooth-proxy
+    version: dev
+
+ota:
+  - platform: http_request
+    id: ota_http_request
+
+update:
+  - platform: http_request
+    id: update_http_request
+    name: Firmware
+    source: https://firmware.esphome.io/bluetooth-proxy/olimex-esp32-poe-iso/manifest.json
+
+http_request:
+
+dashboard_import:
+  package_import_url: github://esphome/bluetooth-proxies/olimex/olimex-esp32-poe-iso.yaml@main

@@ -1,0 +1,24 @@
+packages:
+  m5stack-atom-lite: !include m5stack-atom-lite.yaml
+
+esphome:
+  project:
+    name: esphome.bluetooth-proxy
+    version: dev
+
+improv_serial:
+
+ota:
+  - platform: http_request
+    id: ota_http_request
+
+update:
+  - platform: http_request
+    id: update_http_request
+    name: Firmware
+    source: https://firmware.esphome.io/bluetooth-proxy/m5stack-atom-lite/manifest.json
+
+http_request:
+
+dashboard_import:
+  package_import_url: github://esphome/bluetooth-proxies/m5stack/m5stack-atom-lite.yaml@main
