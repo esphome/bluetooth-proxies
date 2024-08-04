@@ -51,6 +51,6 @@ jobs:
       - build-device-firmware
     uses: esphome/workflows/.github/workflows/upload.yml@main
     with:
-      name: bluetooth-proxy
+      directory: bluetooth-proxy
       version: ${{ needs.build-device-firmware.outputs.version }}
     secrets: inherit
