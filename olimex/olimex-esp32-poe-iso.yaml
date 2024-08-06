@@ -1,5 +1,5 @@
 esphome:
-  name: olimex-bluetooth-proxy
+  name: olimex-esp32-poe-iso
   friendly_name: Bluetooth Proxy
   min_version: 2024.6.0
   name_add_mac_suffix: true

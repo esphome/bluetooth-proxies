@@ -1,6 +1,6 @@
 # Instructions on opening and wiring for flashing on https://blakadder.com/gl-s10
 esphome:
-  name: gl-s10-bt-proxy
+  name: gl-s10
   friendly_name: Bluetooth Proxy
   min_version: 2024.6.0
   name_add_mac_suffix: true
