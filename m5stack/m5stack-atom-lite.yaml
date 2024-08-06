@@ -1,5 +1,5 @@
 esphome:
-  name: atom-lite-bt-proxy
+  name: m5stack-atom-lite
   friendly_name: Bluetooth Proxy
   min_version: 2024.6.0
   name_add_mac_suffix: true

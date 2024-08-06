@@ -1,5 +1,5 @@
 esphome:
-  name: wt32-eth01-bt-proxy
+  name: wt32-eth01
   friendly_name: Bluetooth Proxy
   min_version: 2024.6.0
   name_add_mac_suffix: true

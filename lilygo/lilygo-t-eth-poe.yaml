@@ -1,5 +1,5 @@
 esphome:
-  name: lilygo-ttgo-poe-bt-proxy
+  name: lilygo-t-eth-poe
   friendly_name: Bluetooth Proxy
   min_version: 2024.6.0
   name_add_mac_suffix: true
