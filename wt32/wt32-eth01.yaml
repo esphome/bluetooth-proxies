@@ -3,6 +3,8 @@ esphome:
   friendly_name: Bluetooth Proxy
   min_version: 2024.6.0
   name_add_mac_suffix: true
+  platformio_options:
+    board_build.flash_mode: dio
 
 esp32:
   board: wt32-eth01
