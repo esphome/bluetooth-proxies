@@ -21,6 +21,7 @@ jobs:
       files: |
         esp32-generic/esp32-generic.factory.yaml
         esp32-generic/esp32-generic-c3.factory.yaml
+        esp32-generic/esp32-generic-s3.factory.yaml
       esphome-version: 2024.12.2
       combined-name: esp32-generic
       release-summary: ${{ github.event_name == 'release' && github.event.release.body || '' }}
