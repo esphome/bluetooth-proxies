@@ -1,11 +1,11 @@
 esphome:
-  name: m5stack-atom-s3
+  name: esp32-bluetooth-proxy
   friendly_name: Bluetooth Proxy
   min_version: 2024.12.0
   name_add_mac_suffix: true
 
 esp32:
-  board: m5stack-atoms3
+  board: esp32-s3-devkitc-1
   framework:
     type: esp-idf
 
