@@ -1,7 +1,7 @@
 esphome:
   name: m5stack-atom-s3
   friendly_name: Bluetooth Proxy
-  min_version: 2024.12.0
+  min_version: 2025.2.1
   name_add_mac_suffix: true
 
 esp32:
