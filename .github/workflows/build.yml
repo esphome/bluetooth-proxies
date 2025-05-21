@@ -21,6 +21,7 @@ jobs:
       files: |
         esp32-generic/esp32-generic.factory.yaml
         esp32-generic/esp32-generic-c3.factory.yaml
+        esp32-generic/esp32-generic-c6.factory.yaml
         esp32-generic/esp32-generic-s3.factory.yaml
       esphome-version: 2025.4.1
       combined-name: esp32-generic
