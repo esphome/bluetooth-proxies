@@ -1,7 +1,7 @@
 esphome:
   name: lilygo-t-eth-poe
   friendly_name: Bluetooth Proxy
-  min_version: 2025.5.0
+  min_version: 2025.7.0
   name_add_mac_suffix: true
 
 esp32:
@@ -17,7 +17,9 @@ ethernet:
   type: LAN8720
   mdc_pin: GPIO23
   mdio_pin: GPIO18
-  clk_mode: GPIO17_OUT
+  clk:
+    pin: GPIO17
+    mode: CLK_OUT
   phy_addr: 0
 
 api:
