@@ -23,7 +23,7 @@ jobs:
         esp32-generic/esp32-generic-c3.factory.yaml
         esp32-generic/esp32-generic-c6.factory.yaml
         esp32-generic/esp32-generic-s3.factory.yaml
-      esphome-version: 2025.8.0
+      esphome-version: 2025.8.1
       combined-name: esp32-generic
       release-summary: ${{ github.event_name == 'release' && github.event.release.body || '' }}
       release-url: ${{ github.event_name == 'release' && github.event.release.html_url || '' }}
@@ -40,7 +40,7 @@ jobs:
         m5stack/m5stack-atom-s3.factory.yaml
         olimex/olimex-esp32-poe-iso.factory.yaml
         wt32/wt32-eth01.factory.yaml
-      esphome-version: 2025.8.0
+      esphome-version: 2025.8.1
       release-summary: ${{ github.event_name == 'release' && github.event.release.body || '' }}
       release-url: ${{ github.event_name == 'release' && github.event.release.html_url || '' }}
       release-version: ${{ github.event_name == 'release' && github.event.release.tag_name || '' }}
