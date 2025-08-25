@@ -1,14 +1,11 @@
 esphome:
   name: lilygo-t-eth-poe
   friendly_name: Bluetooth Proxy
-  min_version: 2025.7.0
+  min_version: 2025.8.0
   name_add_mac_suffix: true
 
 esp32:
-  # Platform.io does not have an explicit profile for the module.
-  # We can treat it like a standard dev board based around a standard WROOM module.
-  # See: https://github.com/Xinyuan-LilyGO/LilyGO-T-ETH-POE
-  board: esp32dev
+  variant: esp32
   framework:
     type: esp-idf
 

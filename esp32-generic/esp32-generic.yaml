@@ -1,11 +1,11 @@
 esphome:
   name: esp32-bluetooth-proxy
   friendly_name: Bluetooth Proxy
-  min_version: 2025.5.0
+  min_version: 2025.8.0
   name_add_mac_suffix: true
 
 esp32:
-  board: esp32dev
+  variant: esp32
   framework:
     type: esp-idf
 
