@@ -2,7 +2,7 @@
 esphome:
   name: gl-s10
   friendly_name: Bluetooth Proxy
-  min_version: 2025.7.0
+  min_version: 2025.8.0
   name_add_mac_suffix: true
   # turn on Power LED when esphome boots
   on_boot:
@@ -10,7 +10,7 @@ esphome:
       - output.turn_on: power_led
 
 esp32:
-  board: esp32doit-devkit-v1
+  variant: esp32
   framework:
     type: esp-idf
 
