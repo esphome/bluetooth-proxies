@@ -1,0 +1,17 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Generic ESPHome issue
+    url: https://github.com/esphome/esphome/issues
+    about: Report an issue with ESPHome compiling unrelated to these specific firmwares.
+  - name: Voice Assistant issue
+    url: https://github.com/esphome/wake-word-voice-assistant/issues
+    about: Please search for or create an issue in the bluetooth-proxies repository.
+  - name: Media Player issue
+    url: https://github.com/esphome/media-players/issues
+    about: Please search for or create an issue in the bluetooth-proxies repository.
+  - name: Feature Request
+    url: https://github.com/orgs/esphome/discussions/new/choose
+    about: Please use the discussions for feature requests.
+  - name: Frequently Asked Question
+    url: https://esphome.io/guides/faq.html
+    about: Please view the FAQ for common questions and what to include in a bug report.

@@ -1,0 +1,55 @@
+name: Bluetooth Proxy issue
+description: Report an issue with a device running the provided Bluetooth Proxy firmware.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This issue form is for reporting bugs with the ESPHome Bluetooth Proxy firmware only.
+
+        **This is NOT for:**
+        - Reporting issues with ESPHome itself. Please use the [ESPHome issue tracker](https://github.com/esphome/esphome/issues)
+        - Reporting issues with other firmware or tools not related to the Bluetooth Proxy.
+        - Requesting new device support. We only add new devices we have tested and are happy to recommend.
+
+  - type: textarea
+    validations:
+      required: true
+    id: problem
+    attributes:
+      label: The problem
+      description: >-
+        Describe the issue you are experiencing here to communicate to the
+        maintainers. Tell us what you were trying to do and what happened.
+
+        Provide a clear and concise description of what the problem is.
+
+  - type: dropdown
+    validations:
+      required: true
+    id: chip
+    attributes:
+      label: Which device are you using?
+      options:
+        - Generic
+        - GL-S10
+        - LilyGo T-Eth-PoE
+        - M5Stack Atom Lite
+        - M5Stack Atom S3
+        - Olimex ESP32 PoE ISO
+        - WT32-ETH01
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Anything in the logs that might be useful for us?
+      description: For example, error message, or stack traces. Serial or USB logs are much more useful than WiFi logs.
+      render: txt
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional information
+      description: >
+        If you have any additional information for us, use the field below.
+        Please note, you can attach screenshots or screen recordings here, by
+        dragging and dropping files in the field below.
