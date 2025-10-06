@@ -16,7 +16,7 @@ concurrency:
 jobs:
   build-generic-firmware:
     name: Build Generic Firmware
-    uses: esphome/workflows/.github/workflows/build.yml@2025.8.1
+    uses: esphome/workflows/.github/workflows/build.yml@2025.10.0
     with:
       files: |
         esp32-generic/esp32-generic.factory.yaml
@@ -31,7 +31,7 @@ jobs:
 
   build-device-firmware:
     name: Build Device Firmware
-    uses: esphome/workflows/.github/workflows/build.yml@2025.8.1
+    uses: esphome/workflows/.github/workflows/build.yml@2025.10.0
     with:
       files: |
         gl-inet/gl-s10.factory.yaml
@@ -51,7 +51,7 @@ jobs:
     needs:
       - build-generic-firmware
       - build-device-firmware
-    uses: esphome/workflows/.github/workflows/upload-to-r2.yml@2025.8.1
+    uses: esphome/workflows/.github/workflows/upload-to-r2.yml@2025.10.0
     with:
       directory: bluetooth-proxy
     secrets: inherit
@@ -59,7 +59,7 @@ jobs:
   upload-to-release:
     name: Upload to Release
     if: github.event_name == 'release'
-    uses: esphome/workflows/.github/workflows/upload-to-gh-release.yml@2025.8.1
+    uses: esphome/workflows/.github/workflows/upload-to-gh-release.yml@2025.10.0
     needs:
       - build-generic-firmware
       - build-device-firmware
@@ -69,7 +69,7 @@ jobs:
   promote-prod:
     name: Promote to Production
     if: github.event_name == 'release' && github.event.release.prerelease == false
-    uses: esphome/workflows/.github/workflows/promote-r2.yml@2025.8.1
+    uses: esphome/workflows/.github/workflows/promote-r2.yml@2025.10.0
     needs:
       - upload-to-r2
     with:
