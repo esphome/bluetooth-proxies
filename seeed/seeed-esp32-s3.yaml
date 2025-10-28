@@ -1,0 +1,43 @@
+esphome:
+  name: seeed-esp32-s3
+  friendly_name: Bluetooth Proxy  
+  min_version: 2025.8.0
+  name_add_mac_suffix: true       
+
+esp32:
+  variant: esp32s3
+  framework:
+    type: esp-idf
+
+ethernet:
+  type: W5500
+  cs_pin: GPIO2     
+  clk_pin: GPIO7  
+  mosi_pin: GPIO9
+  miso_pin: GPIO8  
+
+api:
+logger:
+
+ota:
+  - platform: esphome
+    id: ota_esphome
+
+# 配置 ESP32 BLE 扫描器
+esp32_ble_tracker:
+  scan_parameters:
+    interval: 1100ms
+    window: 1100ms
+    active: true
+
+bluetooth_proxy:
+  active: true
+
+button:
+  - platform: safe_mode
+    id: button_safe_mode
+    name: Safe Mode Boot
+
+  - platform: factory_reset
+    id: factory_reset_btn
+    name: Factory reset

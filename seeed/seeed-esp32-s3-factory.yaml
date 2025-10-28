@@ -1,0 +1,22 @@
+packages:
+  seeed-esp32-s3: !include seeed-esp32-s3.yaml
+
+esphome:
+  project:
+    name: esphome.bluetooth-proxy
+    version: dev
+
+ota:
+  - platform: http_request
+    id: ota_http_request
+
+update:
+  - platform: http_request
+    id: update_http_request
+    name: Firmware
+    source: https://firmware.esphome.io/bluetooth-proxy/seeed-esp32-s3/manifest.json
+
+http_request:
+
+dashboard_import:
+  package_import_url: github://esphome/bluetooth-proxies/seeed/seeed-esp32-s3.yaml@main
