@@ -1,5 +1,5 @@
 packages:
-  seeed-esp32-s3: !include seeed-esp32-s3.yaml
+  seeed-esp32-poe: !include seeed-esp32-poe.yaml
 
 esphome:
   project:
@@ -14,9 +14,9 @@ update:
   - platform: http_request
     id: update_http_request
     name: Firmware
-    source: https://firmware.esphome.io/bluetooth-proxy/seeed-esp32-s3/manifest.json
+    source: https://firmware.esphome.io/bluetooth-proxy/seeed-esp32-poe/manifest.json
 
 http_request:
 
 dashboard_import:
-  package_import_url: github://esphome/bluetooth-proxies/seeed/seeed-esp32-s3.yaml@main
+  package_import_url: github://esphome/bluetooth-proxies/seeed/seeed-esp32-poe.yaml@main
