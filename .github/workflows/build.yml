@@ -16,7 +16,7 @@ concurrency:
 jobs:
   build-generic-firmware:
     name: Build Generic Firmware
-    uses: esphome/workflows/.github/workflows/build.yml@2025.8.1
+    uses: esphome/workflows/.github/workflows/build.yml@2025.10.0
     with:
       files: |
         esp32-generic/esp32-generic.factory.yaml
@@ -31,7 +31,7 @@ jobs:
 
   build-device-firmware:
     name: Build Device Firmware
-    uses: esphome/workflows/.github/workflows/build.yml@2025.8.1
+    uses: esphome/workflows/.github/workflows/build.yml@2025.10.0
     with:
       files: |
         gl-inet/gl-s10.factory.yaml
