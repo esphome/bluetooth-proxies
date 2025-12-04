@@ -1,6 +1,6 @@
 # Only boards produced after November 1, 2025 are supported
 esphome:
-  name: seeed-esp32-s3
+  name: seeed-esp32-poe
   friendly_name: Bluetooth Proxy
   min_version: 2025.8.0
   name_add_mac_suffix: true
