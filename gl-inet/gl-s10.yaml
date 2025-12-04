@@ -2,7 +2,7 @@
 esphome:
   name: gl-s10
   friendly_name: Bluetooth Proxy
-  min_version: 2025.8.0
+  min_version: 2025.11.0
   name_add_mac_suffix: true
   # turn on Power LED when esphome boots
   on_boot:
@@ -41,6 +41,9 @@ ota:
   - platform: esphome
     id: ota_esphome
 
+esp32_ble:
+  max_connections: 4
+
 esp32_ble_tracker:
   scan_parameters:
     interval: 1100ms
@@ -61,6 +64,7 @@ esp32_ble_tracker:
 
 bluetooth_proxy:
   active: true
+  connection_slots: 4
 
 button:
   - platform: safe_mode

@@ -1,7 +1,7 @@
 esphome:
   name: wt32-eth01
   friendly_name: Bluetooth Proxy
-  min_version: 2025.8.0
+  min_version: 2025.11.0
   name_add_mac_suffix: true
   platformio_options:
     board_build.flash_mode: dio
@@ -27,6 +27,9 @@ ota:
   - platform: esphome
     id: ota_esphome
 
+esp32_ble:
+  max_connections: 4
+
 esp32_ble_tracker:
   scan_parameters:
     interval: 1100ms
@@ -35,6 +38,7 @@ esp32_ble_tracker:
 
 bluetooth_proxy:
   active: true
+  connection_slots: 4
 
 button:
   - platform: safe_mode
