@@ -16,14 +16,14 @@ concurrency:
 jobs:
   build-generic-firmware:
     name: Build Generic Firmware
-    uses: esphome/workflows/.github/workflows/build.yml@2025.8.1
+    uses: esphome/workflows/.github/workflows/build.yml@2025.10.0
     with:
       files: |
         esp32-generic/esp32-generic.factory.yaml
         esp32-generic/esp32-generic-c3.factory.yaml
         esp32-generic/esp32-generic-c6.factory.yaml
         esp32-generic/esp32-generic-s3.factory.yaml
-      esphome-version: 2025.8.2
+      esphome-version: 2025.11.2
       combined-name: esp32-generic
       release-summary: ${{ github.event_name == 'release' && github.event.release.body || '' }}
       release-url: ${{ github.event_name == 'release' && github.event.release.html_url || '' }}
@@ -31,7 +31,7 @@ jobs:
 
   build-device-firmware:
     name: Build Device Firmware
-    uses: esphome/workflows/.github/workflows/build.yml@2025.8.1
+    uses: esphome/workflows/.github/workflows/build.yml@2025.10.0
     with:
       files: |
         gl-inet/gl-s10.factory.yaml
@@ -40,7 +40,7 @@ jobs:
         m5stack/m5stack-atom-s3.factory.yaml
         olimex/olimex-esp32-poe-iso.factory.yaml
         wt32/wt32-eth01.factory.yaml
-      esphome-version: 2025.8.2
+      esphome-version: 2025.11.2
       release-summary: ${{ github.event_name == 'release' && github.event.release.body || '' }}
       release-url: ${{ github.event_name == 'release' && github.event.release.html_url || '' }}
       release-version: ${{ github.event_name == 'release' && github.event.release.tag_name || '' }}
@@ -51,7 +51,7 @@ jobs:
     needs:
       - build-generic-firmware
       - build-device-firmware
-    uses: esphome/workflows/.github/workflows/upload-to-r2.yml@2025.8.1
+    uses: esphome/workflows/.github/workflows/upload-to-r2.yml@2025.10.0
     with:
       directory: bluetooth-proxy
     secrets: inherit
@@ -59,7 +59,7 @@ jobs:
   upload-to-release:
     name: Upload to Release
     if: github.event_name == 'release'
-    uses: esphome/workflows/.github/workflows/upload-to-gh-release.yml@2025.8.1
+    uses: esphome/workflows/.github/workflows/upload-to-gh-release.yml@2025.10.0
     needs:
       - build-generic-firmware
       - build-device-firmware
@@ -69,7 +69,7 @@ jobs:
   promote-prod:
     name: Promote to Production
     if: github.event_name == 'release' && github.event.release.prerelease == false
-    uses: esphome/workflows/.github/workflows/promote-r2.yml@2025.8.1
+    uses: esphome/workflows/.github/workflows/promote-r2.yml@2025.10.0
     needs:
       - upload-to-r2
     with:
