@@ -39,6 +39,7 @@ jobs:
         m5stack/m5stack-atom-lite.factory.yaml
         m5stack/m5stack-atom-s3.factory.yaml
         olimex/olimex-esp32-poe-iso.factory.yaml
+        seeed/seeed-esp32-poe-factory.yaml
         wt32/wt32-eth01.factory.yaml
       esphome-version: 2025.11.2
       release-summary: ${{ github.event_name == 'release' && github.event.release.body || '' }}
