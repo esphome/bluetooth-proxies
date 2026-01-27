@@ -8,6 +8,7 @@ esp32:
   variant: esp32
   framework:
     type: esp-idf
+  minimum_chip_revision: "3.1" #to reduce binary size
 
 wifi:
   ap:
