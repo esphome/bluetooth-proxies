@@ -8,6 +8,11 @@ esp32:
   variant: esp32
   framework:
     type: esp-idf
+    # Workaround for BLE scanning regression (https://github.com/esphome/esphome/issues/13560)
+    # Remove once ESPHome 2026.2.0 is released
+    version: 5.5.2
+    release: "260206"
+    # end remove
 
 wifi:
   ap:
