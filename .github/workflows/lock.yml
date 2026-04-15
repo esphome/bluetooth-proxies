@@ -14,14 +14,8 @@ concurrency:
 
 jobs:
   lock:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: dessant/lock-threads@7266a7ce5c1df01b1c6db85bf8cd86c737dadbe7  # v6.0.0
-        with:
-          pr-inactive-days: "1"
-          pr-lock-reason: ""
-          exclude-any-pr-labels: keep-open
-
-          issue-inactive-days: "1"
-          issue-lock-reason: ""
-          exclude-any-issue-labels: keep-open
+    uses: esphome/workflows/.github/workflows/lock.yml@3c4e8446aa1029f1c346a482034b3ee1489077ca  # 2026.4.0
+    with:
+      pr-close-days: 1
+      issue-close-days: 1
+      exclude-label: keep-open
