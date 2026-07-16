@@ -32,6 +32,9 @@ jobs:
         with:
           client-id: ${{ vars.ESPHOME_GITHUB_APP_CLIENT_ID }}
           private-key: ${{ secrets.ESPHOME_GITHUB_APP_PRIVATE_KEY }}
+          # Scope the token to what this job does: read the draft release,
+          # replace its manifest assets and publish it.
+          permission-contents: write
 
       - name: Resolve draft release
         id: find
