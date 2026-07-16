@@ -8,8 +8,9 @@ on:
         required: false
         type: string
 
-permissions:
-  contents: write
+# Every step authenticates with the ESPHome GitHub App token (see the
+# comment on the first step); the default GITHUB_TOKEN is never used.
+permissions: {}
 
 concurrency:
   group: release-${{ inputs.tag || 'latest-draft' }}

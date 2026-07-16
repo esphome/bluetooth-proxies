@@ -11,6 +11,9 @@ on:
       - "**.yaml"
       - "**.yml"
 
+permissions:
+  contents: read
+
 jobs:
   yamllint:
     name: yamllint
