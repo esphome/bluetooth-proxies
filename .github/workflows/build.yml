@@ -1,81 +1,222 @@
 name: Build
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
   workflow_dispatch:
-  release:
-    types: [published]
+  workflow_run:
+    workflows: ["Release Drafter"]
+    types: [completed]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name == 'workflow_run' && 'release-drafter' || github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
+  discover-files:
+    name: Discover Factory Configs
+    # Skip the entire pipeline if the Release Drafter run that triggered us failed.
+    if: >-
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    outputs:
+      generic-files: ${{ steps.find.outputs.generic-files }}
+      device-files: ${{ steps.find.outputs.device-files }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+      - name: Find factory configs
+        id: find
+        run: |
+          set -euo pipefail
+          # By convention every device ships a <device>/<device>.factory.yaml;
+          # anything matching *.factory.yaml outside hidden directories is
+          # built. Prune dot-directories (.git, .github) rather than just
+          # filtering them from the results, so find never descends into them.
+          files=$(find . -path '*/.*' -prune -o -name '*.factory.yaml' -print | sed 's|^\./||' | sort)
+          if [[ -z "${files}" ]]; then
+            echo "::error::No *.factory.yaml files found"
+            exit 1
+          fi
+          # The esp32-generic variants are built together with a combined-name
+          # so they share a single manifest; every other device builds on its
+          # own. Split the discovered list accordingly.
+          generic_files=$(grep '^esp32-generic/' <<< "${files}" || true)
+          device_files=$(grep -v '^esp32-generic/' <<< "${files}" || true)
+          if [[ -z "${generic_files}" ]]; then
+            echo "::error::No esp32-generic/*.factory.yaml files found"
+            exit 1
+          fi
+          if [[ -z "${device_files}" ]]; then
+            echo "::error::No device *.factory.yaml files found outside esp32-generic/"
+            exit 1
+          fi
+          echo "Discovered generic factory configs:"
+          echo "${generic_files}"
+          echo "Discovered device factory configs:"
+          echo "${device_files}"
+          {
+            echo "generic-files<<FACTORY_FILES_EOF"
+            echo "${generic_files}"
+            echo "FACTORY_FILES_EOF"
+            echo "device-files<<FACTORY_FILES_EOF"
+            echo "${device_files}"
+            echo "FACTORY_FILES_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+  determine-version:
+    name: Determine Version
+    # Skip the entire pipeline if the Release Drafter run that triggered us failed.
+    if: >-
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.info.outputs.version }}
+      summary: ${{ steps.info.outputs.summary }}
+      url: ${{ steps.info.outputs.url }}
+    steps:
+      - name: Look up draft release info
+        id: info
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          tag=""
+          url=""
+          body=""
+          if [[ "${{ github.event_name }}" == "workflow_run" ]]; then
+            release_json=$(gh api "repos/${{ github.repository }}/releases" \
+              --jq '[.[] | select(.draft == true)] | first')
+            if [[ -z "${release_json}" || "${release_json}" == "null" ]]; then
+              echo "::error::No draft release found"
+              exit 1
+            fi
+            tag=$(echo "${release_json}" | jq -r '.tag_name')
+            url=$(echo "${release_json}" | jq -r '.html_url')
+            # Strip the ASSETS_PENDING caution block from the draft body before
+            # baking it into the firmware as release-summary; the warning is
+            # only meant for the maintainer viewing the draft on GitHub.
+            body=$(echo "${release_json}" | jq -r '.body' \
+              | sed '/^> \[!CAUTION\]/,/<!-- ASSETS_PENDING -->/d' \
+              | sed 's/<!-- ASSETS_PENDING -->//g' \
+              | sed '/./,$!d')
+          fi
+          echo "version=${tag}" >> "$GITHUB_OUTPUT"
+          echo "url=${url}" >> "$GITHUB_OUTPUT"
+          {
+            echo "summary<<RELEASE_SUMMARY_EOF"
+            echo "${body}"
+            echo "RELEASE_SUMMARY_EOF"
+          } >> "$GITHUB_OUTPUT"
+
   build-generic-firmware:
     name: Build Generic Firmware
+    needs:
+      - discover-files
+      - determine-version
     uses: esphome/workflows/.github/workflows/build.yml@025a1e6255610c498ed590403b7e510b69e474df  # 2026.4.1
     with:
-      files: |
-        esp32-generic/esp32-generic.factory.yaml
-        esp32-generic/esp32-generic-c3.factory.yaml
-        esp32-generic/esp32-generic-c6.factory.yaml
-        esp32-generic/esp32-generic-s3.factory.yaml
+      files: ${{ needs.discover-files.outputs.generic-files }}
       esphome-version: 2026.6.3
       combined-name: esp32-generic
-      release-summary: ${{ github.event_name == 'release' && github.event.release.body || '' }}
-      release-url: ${{ github.event_name == 'release' && github.event.release.html_url || '' }}
-      release-version: ${{ github.event_name == 'release' && github.event.release.tag_name || '' }}
+      release-summary: ${{ needs.determine-version.outputs.summary }}
+      release-url: ${{ needs.determine-version.outputs.url }}
+      release-version: ${{ needs.determine-version.outputs.version }}
 
   build-device-firmware:
     name: Build Device Firmware
+    needs:
+      - discover-files
+      - determine-version
     uses: esphome/workflows/.github/workflows/build.yml@025a1e6255610c498ed590403b7e510b69e474df  # 2026.4.1
     with:
-      files: |
-        gl-inet/gl-s10.factory.yaml
-        lilygo/lilygo-t-eth-poe.factory.yaml
-        m5stack/m5stack-atom-lite.factory.yaml
-        m5stack/m5stack-atom-s3.factory.yaml
-        olimex/olimex-esp32-poe-iso.factory.yaml
-        seeed/seeed-esp32-poe-factory.yaml
-        wt32/wt32-eth01.factory.yaml
+      files: ${{ needs.discover-files.outputs.device-files }}
       esphome-version: 2026.6.3
-      release-summary: ${{ github.event_name == 'release' && github.event.release.body || '' }}
-      release-url: ${{ github.event_name == 'release' && github.event.release.html_url || '' }}
-      release-version: ${{ github.event_name == 'release' && github.event.release.tag_name || '' }}
+      release-summary: ${{ needs.determine-version.outputs.summary }}
+      release-url: ${{ needs.determine-version.outputs.url }}
+      release-version: ${{ needs.determine-version.outputs.version }}
 
-  upload-to-r2:
-    if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
-    name: Upload to R2
+  clean-draft-assets:
+    name: Clean Draft Release Assets
+    # Delete any pre-existing assets so renamed files (e.g. when the version
+    # bumps from .1 to .2) don't linger alongside the new ones. Gated on
+    # build success so a failed build doesn't leave the draft release empty.
+    if: github.event_name == 'workflow_run'
     needs:
       - build-generic-firmware
       - build-device-firmware
-    uses: esphome/workflows/.github/workflows/upload-to-r2.yml@025a1e6255610c498ed590403b7e510b69e474df  # 2026.4.1
-    with:
-      directory: bluetooth-proxy
-    secrets: inherit
+      - determine-version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Delete existing assets from draft release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          tag="${{ needs.determine-version.outputs.version }}"
+          release=$(gh api "repos/${{ github.repository }}/releases" \
+            --jq "[.[] | select(.tag_name == \"${tag}\" and .draft == true)] | first")
+          if [[ -z "${release}" || "${release}" == "null" ]]; then
+            echo "Draft release ${tag} not found; nothing to clean"
+            exit 0
+          fi
+          release_id=$(echo "${release}" | jq -r '.id')
+          asset_ids=$(gh api "repos/${{ github.repository }}/releases/${release_id}/assets" \
+            --jq '.[].id')
+          for id in ${asset_ids}; do
+            echo "Deleting asset ${id}"
+            gh api "repos/${{ github.repository }}/releases/assets/${id}" \
+              --method DELETE --silent
+          done
 
-  upload-to-release:
-    name: Upload to Release
-    if: github.event_name == 'release'
+  upload-to-draft-release:
+    name: Upload to Draft Release
+    if: github.event_name == 'workflow_run'
+    needs:
+      - build-generic-firmware
+      - build-device-firmware
+      - determine-version
+      - clean-draft-assets
     uses: esphome/workflows/.github/workflows/upload-to-gh-release.yml@025a1e6255610c498ed590403b7e510b69e474df  # 2026.4.1
-    needs:
-      - build-generic-firmware
-      - build-device-firmware
     with:
-      version: ${{ github.event.release.tag_name }}
+      version: ${{ needs.determine-version.outputs.version }}
+      draft: true
 
-  promote-prod:
-    name: Promote to Production
-    if: github.event_name == 'release' && github.event.release.prerelease == false
-    uses: esphome/workflows/.github/workflows/promote-r2.yml@025a1e6255610c498ed590403b7e510b69e474df  # 2026.4.1
+  remove-pending-warning:
+    name: Remove Pending Warning
+    if: github.event_name == 'workflow_run'
     needs:
-      - upload-to-r2
-    with:
-      version: ${{ github.event.release.tag_name }}
-      directory: bluetooth-proxy
-      channel: production
-      manifest-filename: manifest.json
-    secrets: inherit
+      - upload-to-draft-release
+      - determine-version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Remove ASSETS_PENDING warning from draft release body
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          tag="${{ needs.determine-version.outputs.version }}"
+          release=$(gh api "repos/${{ github.repository }}/releases" \
+            --jq "[.[] | select(.tag_name == \"${tag}\" and .draft == true)] | first")
+          if [[ -z "${release}" || "${release}" == "null" ]]; then
+            echo "Draft release ${tag} not found; nothing to clean up"
+            exit 0
+          fi
+          release_id=$(echo "${release}" | jq -r '.id')
+          body=$(echo "${release}" | jq -r '.body')
+          new_body=$(echo "${body}" \
+            | sed '/^> \[!CAUTION\]/,/<!-- ASSETS_PENDING -->/d' \
+            | sed 's/<!-- ASSETS_PENDING -->//g' \
+            | sed '/./,$!d')
+          if [[ "${new_body}" != "${body}" ]]; then
+            gh api "repos/${{ github.repository }}/releases/${release_id}" \
+              --method PATCH \
+              --field "body=${new_body}" \
+              --field "draft=true" \
+              --silent
+          fi

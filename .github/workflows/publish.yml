@@ -1,0 +1,153 @@
+name: Publish
+
+on:
+  release:
+    types: [published]
+
+concurrency:
+  group: publish-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+
+jobs:
+  discover-devices:
+    name: Discover devices in release
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.find.outputs.matrix }}
+      directory: ${{ steps.directory.outputs.directory }}
+    steps:
+      - name: Determine firmware directory
+        id: directory
+        env:
+          # Set a `FIRMWARE_DIRECTORY` repository variable to override the
+          # default, which is the repository name singularized
+          # (e.g. rf-proxies -> rf-proxy, media-players -> media-player).
+          # This is the directory used on https://firmware.esphome.io/ and
+          # must match the `update.source` URLs in the factory YAML files.
+          OVERRIDE: ${{ vars.FIRMWARE_DIRECTORY }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: |
+          set -euo pipefail
+          directory="${OVERRIDE}"
+          if [[ -z "${directory}" ]]; then
+            if [[ "${REPO_NAME}" == *ies ]]; then
+              directory="${REPO_NAME%ies}y"
+            else
+              directory="${REPO_NAME%s}"
+            fi
+          fi
+          echo "directory=${directory}" >> "$GITHUB_OUTPUT"
+          echo "Firmware directory: ${directory}"
+
+      - name: List devices from release manifests
+        id: find
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p manifests
+          gh release download "${{ github.event.release.tag_name }}" \
+            --repo "${{ github.repository }}" \
+            --dir manifests \
+            --pattern '*.manifest.json'
+          devices=$(ls manifests | sed 's/\.manifest\.json$//' \
+            | jq -R -s 'split("\n") | map(select(length > 0))')
+          if [[ "$(echo "${devices}" | jq 'length')" -eq 0 ]]; then
+            echo "::error::No <device>.manifest.json assets found on release"
+            exit 1
+          fi
+          echo "matrix=$(jq -c -n --argjson devices "${devices}" '{device: $devices}')" >> "$GITHUB_OUTPUT"
+          echo "Discovered devices: ${devices}"
+
+  prepare-artifact:
+    name: Prepare ${{ matrix.device }} artifact
+    needs: discover-devices
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.discover-devices.outputs.matrix) }}
+    steps:
+      - name: Download device assets and reconstruct layout
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEVICE: ${{ matrix.device }}
+          VERSION: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+          # Recreate the `<version>/{manifest.json,*.bin}` layout that
+          # upload-to-r2 / promote-r2 expect from a build.yml run. The
+          # artifact name (= device) becomes the surrounding directory when
+          # download-artifact runs in the reusable workflows.
+          target="output/${VERSION}"
+          mkdir -p "${target}"
+
+          # Pull just this device's manifest first so we know which
+          # binaries to fetch — avoids each matrix runner re-downloading
+          # every other device's bins.
+          gh release download "${VERSION}" \
+            --repo "${{ github.repository }}" \
+            --dir "${target}" \
+            --pattern "${DEVICE}.manifest.json"
+          mv "${target}/${DEVICE}.manifest.json" "${target}/manifest.json"
+
+          # Build a multi-pattern download for the bins the manifest
+          # references (ota + parts), then run a single gh call.
+          patterns=()
+          while IFS= read -r bin; do
+            [[ -z "${bin}" ]] && continue
+            patterns+=(--pattern "${bin}")
+          done < <(jq -r '[
+            (.builds[]?.ota.path // empty),
+            (.builds[]?.parts[]?.path // empty)
+          ] | unique | .[]' "${target}/manifest.json")
+
+          if [[ "${#patterns[@]}" -gt 0 ]]; then
+            gh release download "${VERSION}" \
+              --repo "${{ github.repository }}" \
+              --dir "${target}" \
+              "${patterns[@]}"
+          fi
+
+      - name: Upload firmware artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        with:
+          name: ${{ matrix.device }}
+          path: output
+          if-no-files-found: error
+
+  upload-to-r2:
+    name: Upload to R2
+    needs:
+      - discover-devices
+      - prepare-artifact
+    uses: esphome/workflows/.github/workflows/upload-to-r2.yml@025a1e6255610c498ed590403b7e510b69e474df  # 2026.4.1
+    with:
+      directory: ${{ needs.discover-devices.outputs.directory }}
+    secrets: inherit
+
+  promote-beta:
+    name: Promote to Beta
+    needs:
+      - discover-devices
+      - upload-to-r2
+    uses: esphome/workflows/.github/workflows/promote-r2.yml@025a1e6255610c498ed590403b7e510b69e474df  # 2026.4.1
+    with:
+      version: ${{ github.event.release.tag_name }}
+      directory: ${{ needs.discover-devices.outputs.directory }}
+      channel: beta
+      manifest-filename: manifest-beta.json
+    secrets: inherit
+
+  promote-prod:
+    name: Promote to Production
+    if: github.event.release.prerelease == false
+    needs:
+      - discover-devices
+      - upload-to-r2
+    uses: esphome/workflows/.github/workflows/promote-r2.yml@025a1e6255610c498ed590403b7e510b69e474df  # 2026.4.1
+    with:
+      version: ${{ github.event.release.tag_name }}
+      directory: ${{ needs.discover-devices.outputs.directory }}
+      channel: production
+      manifest-filename: manifest.json
+    secrets: inherit

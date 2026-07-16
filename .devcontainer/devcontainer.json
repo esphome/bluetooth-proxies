@@ -1,0 +1,13 @@
+{
+  "name": "ESPHome - Bluetooth Proxies",
+  "image": "mcr.microsoft.com/devcontainers/python:3.13",
+  "postCreateCommand": "pip3 install esphome",
+  "runArgs": ["--device=/dev/bus/usb", "--privileged"],
+  "features": { "ghcr.io/devcontainers/features/github-cli": {} },
+  "customizations": {
+    "vscode": {
+      "settings": { "esphome.validator": "local" },
+      "extensions": ["ESPHome.esphome-vscode"]
+    }
+  }
+}

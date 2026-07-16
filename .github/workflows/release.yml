@@ -1,0 +1,112 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to publish (defaults to the most recent draft)"
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ inputs.tag || 'latest-draft' }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Patch manifests and publish
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      # We use a GitHub App token (not GITHUB_TOKEN) so that publishing the
+      # release fires a `release: published` event downstream — the default
+      # GITHUB_TOKEN intentionally does not trigger further workflows, which
+      # would leave publish.yml dormant.
+      - name: Generate a token
+        id: generate-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1  # v3.2.0
+        with:
+          client-id: ${{ vars.ESPHOME_GITHUB_APP_CLIENT_ID }}
+          private-key: ${{ secrets.ESPHOME_GITHUB_APP_PRIVATE_KEY }}
+
+      - name: Resolve draft release
+        id: find
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          tag="${INPUT_TAG}"
+          if [[ -z "${tag}" ]]; then
+            tag=$(gh api "repos/${{ github.repository }}/releases" \
+              --jq '[.[] | select(.draft == true)] | first | .tag_name // ""')
+          fi
+          if [[ -z "${tag}" || "${tag}" == "null" ]]; then
+            echo "::error::No draft release found"
+            exit 1
+          fi
+          release=$(gh api "repos/${{ github.repository }}/releases" \
+            --jq "[.[] | select(.tag_name == \"${tag}\" and .draft == true)] | first")
+          if [[ -z "${release}" || "${release}" == "null" ]]; then
+            echo "::error::Draft release ${tag} not found"
+            exit 1
+          fi
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+          echo "release_id=$(echo "${release}" | jq -r '.id')" >> "$GITHUB_OUTPUT"
+          echo "url=$(echo "${release}" | jq -r '.html_url')" >> "$GITHUB_OUTPUT"
+          {
+            echo "body<<RELEASE_BODY_EOF"
+            echo "${release}" | jq -r '.body'
+            echo "RELEASE_BODY_EOF"
+          } >> "$GITHUB_OUTPUT"
+          echo "Resolved draft release: ${tag}"
+
+      - name: Download manifest assets
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p assets
+          gh release download "${{ steps.find.outputs.tag }}" \
+            --repo "${{ github.repository }}" \
+            --dir assets \
+            --pattern '*.manifest.json'
+
+      - name: Patch manifests with current release body
+        env:
+          RELEASE_SUMMARY: ${{ steps.find.outputs.body }}
+          RELEASE_URL: ${{ steps.find.outputs.url }}
+        run: |
+          set -euo pipefail
+          mkdir -p patched
+          for manifest in assets/*.manifest.json; do
+            jq --arg summary "${RELEASE_SUMMARY}" --arg url "${RELEASE_URL}" \
+              '.builds[].ota |= (.summary = $summary | .release_url = $url)' \
+              "${manifest}" > "patched/$(basename "${manifest}")"
+          done
+
+      - name: Re-upload patched manifests to draft release
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+        run: |
+          set -euo pipefail
+          tag="${{ steps.find.outputs.tag }}"
+          for manifest in patched/*.manifest.json; do
+            echo "Replacing ${manifest}"
+            gh release upload "${tag}" "${manifest}" \
+              --repo "${{ github.repository }}" \
+              --clobber
+          done
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+        run: |
+          set -euo pipefail
+          gh release edit "${{ steps.find.outputs.tag }}" \
+            --repo "${{ github.repository }}" \
+            --draft=false
+          echo "Published ${{ steps.find.outputs.tag }} — publish.yml will pick it up via release: published"

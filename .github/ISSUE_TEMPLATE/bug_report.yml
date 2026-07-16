@@ -1,15 +1,21 @@
-name: Bluetooth Proxy issue
-description: Report an issue with a device running the provided Bluetooth Proxy firmware.
+name: Bluetooth Proxies Bug Report
+description: |-
+  Report an issue with the Bluetooth Proxies firmware provided by this repository,
+  the web installer and the provided OTA updates.
 body:
   - type: markdown
     attributes:
       value: |
-        This issue form is for reporting bugs with the ESPHome Bluetooth Proxy firmware only.
+        This issue form is for reporting bugs with the Bluetooth Proxies firmware that is compiled and released
+        from this repository. This includes flashing the firmware from the ESPHome projects page and the OTA updates that are provided.
 
         **This is NOT for:**
         - Reporting issues with ESPHome itself. Please use the [ESPHome issue tracker](https://github.com/esphome/esphome/issues)
-        - Reporting issues with other firmware or tools not related to the Bluetooth Proxy.
         - Requesting new device support. We only add new devices we have tested and are happy to recommend.
+
+        If you have taken control of the device in the ESPHome Builder, please report the issue in the main [ESPHome issue tracker][issues].
+
+        [issues]: https://github.com/esphome/esphome/issues
 
   - type: textarea
     validations:
@@ -26,23 +32,38 @@ body:
   - type: dropdown
     validations:
       required: true
-    id: chip
+    id: device
     attributes:
       label: Which device are you using?
       options:
-        - Generic
-        - GL-S10
-        - LilyGo T-Eth-PoE
-        - M5Stack Atom Lite
-        - M5Stack Atom S3
-        - Olimex ESP32 PoE ISO
-        - WT32-ETH01
+        - esp32-generic
+        - esp32-generic-c3
+        - esp32-generic-c6
+        - esp32-generic-s3
+        - gl-s10
+        - lilygo-t-eth-poe
+        - m5stack-atom-lite
+        - m5stack-atom-s3
+        - olimex-esp32-poe-iso
+        - seeed-esp32-poe
+        - wt32-eth01
+
+  - type: input
+    id: version
+    validations:
+      required: true
+    attributes:
+      label: Firmware Version
+      description: >
+        The version of the installed firmware. This is **NOT** the ESPHome version, but is in the format `26.7.1` for example.
 
   - type: textarea
     id: logs
+    validations:
+      required: true
     attributes:
-      label: Anything in the logs that might be useful for us?
-      description: For example, error message, or stack traces. Serial or USB logs are much more useful than WiFi logs.
+      label: Logs
+      description: For example, error messages or stack traces. Serial logs from the USB port are much more useful than WiFi logs.
       render: txt
 
   - type: textarea
