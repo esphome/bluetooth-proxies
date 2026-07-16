@@ -7,6 +7,9 @@ on:
     workflows: ["Release Drafter"]
     types: [completed]
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'workflow_run' && 'release-drafter' || github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -71,6 +74,10 @@ jobs:
       github.event_name != 'workflow_run' ||
       github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
+    permissions:
+      # Draft releases are only visible to tokens with push access, so
+      # reading the draft requires contents: write despite being read-only.
+      contents: write
     outputs:
       version: ${{ steps.info.outputs.version }}
       summary: ${{ steps.info.outputs.summary }}
@@ -180,6 +187,8 @@ jobs:
       - build-device-firmware
       - determine-version
       - clean-draft-assets
+    permissions:
+      contents: write
     uses: esphome/workflows/.github/workflows/upload-to-gh-release.yml@025a1e6255610c498ed590403b7e510b69e474df  # 2026.4.1
     with:
       version: ${{ needs.determine-version.outputs.version }}

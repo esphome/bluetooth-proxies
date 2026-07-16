@@ -34,7 +34,7 @@ jobs:
 
           # Highest existing tag (draft or published) matching the current YY.M.*
           latest_seq=$(gh api "repos/${{ github.repository }}/releases" --paginate \
-            --jq "[.[] | select(.tag_name | startswith(\"${prefix}\")) | .tag_name | sub(\"^${prefix}\"; \"\") | tonumber] | max // 0")
+            --jq "[.[] | select(.tag_name | startswith(\"${prefix}\")) | .tag_name | ltrimstr(\"${prefix}\") | tonumber] | max // 0")
 
           if [[ "${latest_seq}" -eq 0 ]]; then
             seq=1
