@@ -3,8 +3,8 @@ on:
   schedule:
     - cron: '50 18 * * *'
 
-# Only issues are processed (no stale-pr-message is configured, so
-# actions/stale never marks pull requests), so no pull-requests scope.
+# Only issues are processed (days-before-pr-stale: -1 disables pull
+# request processing entirely), so no pull-requests scope.
 permissions:
   issues: write
 
@@ -17,6 +17,7 @@ jobs:
           stale-issue-message: 'As there has been no activity on this issue for 30 days, I am marking it as stale. If you think this is a mistake, please comment below and I will remove the stale label.'
           close-issue-message: 'This issue has been closed due to inactivity. If you think this is a mistake, please comment below.'
           days-before-stale: 30
+          days-before-pr-stale: -1
           days-before-close: 5
           stale-issue-label: 'stale'
           exempt-issue-labels: 'not-stale'
