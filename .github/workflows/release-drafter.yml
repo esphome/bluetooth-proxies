@@ -1,0 +1,63 @@
+name: Release Drafter
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: read
+
+concurrency:
+  group: release-drafter
+  cancel-in-progress: false
+
+jobs:
+  release-drafter:
+    name: Update draft release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Calculate calver version
+        id: calver
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          # CalVer scheme: YY.M.N
+          #   YY = year mod 100 (e.g. 2026 -> 26)
+          #   M  = month, no zero padding (e.g. April -> 4)
+          #   N  = sequential release of that month, starting at 1
+          year=$(date -u +%y)
+          month=$(date -u +%-m)
+          prefix="${year}.${month}."
+
+          # Highest existing tag (draft or published) matching the current YY.M.*
+          latest_seq=$(gh api "repos/${{ github.repository }}/releases" --paginate \
+            --jq "[.[] | select(.tag_name | startswith(\"${prefix}\")) | .tag_name | ltrimstr(\"${prefix}\") | tonumber] | max // 0")
+
+          if [[ "${latest_seq}" -eq 0 ]]; then
+            seq=1
+          else
+            # If the existing release at the highest seq is still a draft, reuse it
+            # so subsequent pushes update the same draft. Otherwise start a new one.
+            is_draft=$(gh api "repos/${{ github.repository }}/releases" --paginate \
+              --jq "[.[] | select(.tag_name == \"${prefix}${latest_seq}\")] | first | .draft")
+            if [[ "${is_draft}" == "true" ]]; then
+              seq=${latest_seq}
+            else
+              seq=$((latest_seq + 1))
+            fi
+          fi
+
+          version="${prefix}${seq}"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "Calculated calver version: ${version}"
+
+      - uses: release-drafter/release-drafter@4d75298e00d9e34c483e5ff8c68d0ea1c1940c1e  # v7.5.1
+        with:
+          version: ${{ steps.calver.outputs.version }}
+          tag: ${{ steps.calver.outputs.version }}
+          name: ${{ steps.calver.outputs.version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

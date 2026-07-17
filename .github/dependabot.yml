@@ -1,11 +1,9 @@
----
 version: 2
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: daily
-      time: "06:00"
+      interval: "weekly"
     groups:
       shared-workflows:
         patterns:
