@@ -93,8 +93,11 @@ jobs:
           url=""
           body=""
           if [[ "${{ github.event_name }}" == "workflow_run" ]]; then
+            # Ignore drafts whose tag was reset to an untagged-* placeholder
+            # (a stray PATCH without tag_name causes this) — building against
+            # one would bake the placeholder into the firmware as its version.
             release_json=$(gh api "repos/${{ github.repository }}/releases" \
-              --jq '[.[] | select(.draft == true)] | first')
+              --jq '[.[] | select(.draft == true and (.tag_name | startswith("untagged-") | not))] | first')
             if [[ -z "${release_json}" || "${release_json}" == "null" ]]; then
               echo "::error::No draft release found"
               exit 1
@@ -223,9 +226,13 @@ jobs:
             | sed 's/<!-- ASSETS_PENDING -->//g' \
             | sed '/./,$!d')
           if [[ "${new_body}" != "${body}" ]]; then
+            # tag_name and name must be re-sent: updating a draft release
+            # without them resets its tag to an untagged-* placeholder.
             gh api "repos/${{ github.repository }}/releases/${release_id}" \
               --method PATCH \
               --field "body=${new_body}" \
+              --field "tag_name=${tag}" \
+              --field "name=${tag}" \
               --field "draft=true" \
               --silent
           fi

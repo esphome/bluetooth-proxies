@@ -45,8 +45,11 @@ jobs:
           set -euo pipefail
           tag="${INPUT_TAG}"
           if [[ -z "${tag}" ]]; then
+            # Ignore drafts whose tag was reset to an untagged-* placeholder
+            # (a stray PATCH without tag_name causes this) — publishing one
+            # would create a release under the placeholder tag.
             tag=$(gh api "repos/${{ github.repository }}/releases" \
-              --jq '[.[] | select(.draft == true)] | first | .tag_name // ""')
+              --jq '[.[] | select(.draft == true and (.tag_name | startswith("untagged-") | not))] | first | .tag_name // ""')
           fi
           if [[ -z "${tag}" || "${tag}" == "null" ]]; then
             echo "::error::No draft release found"
@@ -74,10 +77,27 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p assets
-          gh release download "${{ steps.find.outputs.tag }}" \
-            --repo "${{ github.repository }}" \
-            --dir assets \
-            --pattern '*.manifest.json'
+          # Work with the release id resolved above instead of `gh release
+          # download <tag>`: gh's draft-by-tag resolution has proven
+          # unreliable (it caused duplicate drafts in esphome/workflows'
+          # upload-to-gh-release.yml), while lookups by id always work.
+          release_id="${{ steps.find.outputs.release_id }}"
+          if ! assets=$(gh api "repos/${{ github.repository }}/releases/${release_id}/assets" \
+            --paginate \
+            --jq '.[] | select(.name | endswith(".manifest.json")) | "\(.id)\t\(.name)"'); then
+            echo "::error::Failed to list draft release assets"
+            exit 1
+          fi
+          if [[ -z "${assets}" ]]; then
+            echo "::error::No *.manifest.json assets found on draft release"
+            exit 1
+          fi
+          while IFS=$'\t' read -r asset_id asset_name; do
+            echo "Downloading ${asset_name}"
+            gh api -H "Accept: application/octet-stream" \
+              "repos/${{ github.repository }}/releases/assets/${asset_id}" \
+              > "assets/${asset_name}"
+          done <<< "${assets}"
 
       - name: Patch manifests with current release body
         env:
@@ -97,12 +117,30 @@ jobs:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
           set -euo pipefail
-          tag="${{ steps.find.outputs.tag }}"
+          # Upload by release id rather than `gh release upload <tag>
+          # --clobber` for the same reason as the download step: draft-by-tag
+          # resolution is unreliable. Clobber semantics are replicated by
+          # deleting any same-named asset before uploading.
+          release_id="${{ steps.find.outputs.release_id }}"
+          if ! existing=$(gh api "repos/${{ github.repository }}/releases/${release_id}/assets" \
+            --paginate \
+            --jq '.[] | "\(.id)\t\(.name)"'); then
+            echo "::error::Failed to list draft release assets"
+            exit 1
+          fi
           for manifest in patched/*.manifest.json; do
-            echo "Replacing ${manifest}"
-            gh release upload "${tag}" "${manifest}" \
-              --repo "${{ github.repository }}" \
-              --clobber
+            name=$(basename "${manifest}")
+            asset_id=$(awk -F'\t' -v name="${name}" '$2 == name {print $1}' <<< "${existing}")
+            if [[ -n "${asset_id}" ]]; then
+              echo "Deleting existing asset ${name} (${asset_id})"
+              gh api "repos/${{ github.repository }}/releases/assets/${asset_id}" \
+                --method DELETE --silent
+            fi
+            echo "Uploading ${name}"
+            gh api --method POST \
+              -H "Content-Type: application/json" \
+              "https://uploads.github.com/repos/${{ github.repository }}/releases/${release_id}/assets?name=${name}" \
+              --input "${manifest}" --silent
           done
 
       - name: Publish release
@@ -110,7 +148,16 @@ jobs:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
           set -euo pipefail
-          gh release edit "${{ steps.find.outputs.tag }}" \
-            --repo "${{ github.repository }}" \
-            --draft=false
-          echo "Published ${{ steps.find.outputs.tag }} — publish.yml will pick it up via release: published"
+          tag="${{ steps.find.outputs.tag }}"
+          # Publish by id, not `gh release edit <tag> --draft=false`: besides
+          # the unreliable draft-by-tag resolution, gh sends a PATCH with only
+          # draft=false — and updating a draft without re-sending tag_name
+          # resets its tag to an untagged-* placeholder, which would then be
+          # published as the release tag.
+          gh api "repos/${{ github.repository }}/releases/${{ steps.find.outputs.release_id }}" \
+            --method PATCH \
+            --field "tag_name=${tag}" \
+            --field "name=${tag}" \
+            --field "draft=false" \
+            --silent
+          echo "Published ${tag} — publish.yml will pick it up via release: published"
