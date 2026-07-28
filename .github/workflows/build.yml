@@ -1,5 +1,11 @@
 name: Build
 
+# Unlike the other release workflows this repo cannot use the reusable
+# esphome/workflows build-to-draft-release.yml yet: the esp32-generic
+# variants must build as one group with `combined-name` (their update.source
+# URLs all point at the single esp32-generic manifest), which the shared
+# workflow does not support. The inline jobs below mirror its implementation.
+
 on:
   pull_request:
   workflow_dispatch:
@@ -86,28 +92,38 @@ jobs:
       - name: Look up draft release info
         id: info
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
           set -euo pipefail
           tag=""
           url=""
           body=""
-          if [[ "${{ github.event_name }}" == "workflow_run" ]]; then
+          if [[ "${EVENT_NAME}" == "workflow_run" ]]; then
+            if ! releases=$(gh api "repos/${GH_REPO}/releases?per_page=100"); then
+              echo "::error::Failed to list releases"
+              exit 1
+            fi
             # Ignore drafts whose tag was reset to an untagged-* placeholder
             # (a stray PATCH without tag_name causes this) — building against
             # one would bake the placeholder into the firmware as its version.
-            release_json=$(gh api "repos/${{ github.repository }}/releases" \
-              --jq '[.[] | select(.draft == true and (.tag_name | startswith("untagged-") | not))] | first')
+            release_json=$(jq \
+              '[.[] | select(.draft == true and (.tag_name | startswith("untagged-") | not))] | first' \
+              <<< "${releases}")
             if [[ -z "${release_json}" || "${release_json}" == "null" ]]; then
               echo "::error::No draft release found"
               exit 1
             fi
-            tag=$(echo "${release_json}" | jq -r '.tag_name')
-            url=$(echo "${release_json}" | jq -r '.html_url')
+            tag=$(jq -r '.tag_name' <<< "${release_json}")
+            # Do NOT use the draft's html_url: for a draft it always points
+            # at an untagged-* placeholder that 404s once the release is
+            # published. The final URL is deterministic from the tag.
+            url="https://github.com/${GH_REPO}/releases/tag/${tag}"
             # Strip the ASSETS_PENDING caution block from the draft body before
             # baking it into the firmware as release-summary; the warning is
             # only meant for the maintainer viewing the draft on GitHub.
-            body=$(echo "${release_json}" | jq -r '.body' \
+            body=$(jq -r '.body' <<< "${release_json}" \
               | sed '/^> \[!CAUTION\]/,/<!-- ASSETS_PENDING -->/d' \
               | sed 's/<!-- ASSETS_PENDING -->//g' \
               | sed '/./,$!d')
@@ -125,10 +141,10 @@ jobs:
     needs:
       - discover-files
       - determine-version
-    uses: esphome/workflows/.github/workflows/build.yml@025a1e6255610c498ed590403b7e510b69e474df  # 2026.4.1
+    uses: esphome/workflows/.github/workflows/build.yml@9f6577fd37b5cf773ab1b9be929714a0dcd15661  # 2026.7.0
     with:
       files: ${{ needs.discover-files.outputs.generic-files }}
-      esphome-version: 2026.6.3
+      esphome-version: 2026.7.1
       combined-name: esp32-generic
       release-summary: ${{ needs.determine-version.outputs.summary }}
       release-url: ${{ needs.determine-version.outputs.url }}
@@ -139,10 +155,10 @@ jobs:
     needs:
       - discover-files
       - determine-version
-    uses: esphome/workflows/.github/workflows/build.yml@025a1e6255610c498ed590403b7e510b69e474df  # 2026.4.1
+    uses: esphome/workflows/.github/workflows/build.yml@9f6577fd37b5cf773ab1b9be929714a0dcd15661  # 2026.7.0
     with:
       files: ${{ needs.discover-files.outputs.device-files }}
-      esphome-version: 2026.6.3
+      esphome-version: 2026.7.1
       release-summary: ${{ needs.determine-version.outputs.summary }}
       release-url: ${{ needs.determine-version.outputs.url }}
       release-version: ${{ needs.determine-version.outputs.version }}
@@ -163,23 +179,29 @@ jobs:
     steps:
       - name: Delete existing assets from draft release
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.determine-version.outputs.version }}
         run: |
           set -euo pipefail
-          tag="${{ needs.determine-version.outputs.version }}"
-          release=$(gh api "repos/${{ github.repository }}/releases" \
-            --jq "[.[] | select(.tag_name == \"${tag}\" and .draft == true)] | first")
+          if ! releases=$(gh api "repos/${GH_REPO}/releases?per_page=100"); then
+            echo "::error::Failed to list releases"
+            exit 1
+          fi
+          release=$(jq --arg tag "${TAG}" \
+            '[.[] | select(.tag_name == $tag and .draft == true)] | first' <<< "${releases}")
           if [[ -z "${release}" || "${release}" == "null" ]]; then
-            echo "Draft release ${tag} not found; nothing to clean"
+            echo "Draft release ${TAG} not found; nothing to clean"
             exit 0
           fi
-          release_id=$(echo "${release}" | jq -r '.id')
-          asset_ids=$(gh api "repos/${{ github.repository }}/releases/${release_id}/assets" \
-            --jq '.[].id')
+          release_id=$(jq -r '.id' <<< "${release}")
+          if ! asset_ids=$(gh api "repos/${GH_REPO}/releases/${release_id}/assets" --paginate --jq '.[].id'); then
+            echo "::error::Failed to list draft release assets"
+            exit 1
+          fi
           for id in ${asset_ids}; do
             echo "Deleting asset ${id}"
-            gh api "repos/${{ github.repository }}/releases/assets/${id}" \
-              --method DELETE --silent
+            gh api "repos/${GH_REPO}/releases/assets/${id}" --method DELETE --silent
           done
 
   upload-to-draft-release:
@@ -192,7 +214,7 @@ jobs:
       - clean-draft-assets
     permissions:
       contents: write
-    uses: esphome/workflows/.github/workflows/upload-to-gh-release.yml@025a1e6255610c498ed590403b7e510b69e474df  # 2026.4.1
+    uses: esphome/workflows/.github/workflows/upload-to-gh-release.yml@9f6577fd37b5cf773ab1b9be929714a0dcd15661  # 2026.7.0
     with:
       version: ${{ needs.determine-version.outputs.version }}
       draft: true
@@ -209,18 +231,23 @@ jobs:
     steps:
       - name: Remove ASSETS_PENDING warning from draft release body
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.determine-version.outputs.version }}
         run: |
           set -euo pipefail
-          tag="${{ needs.determine-version.outputs.version }}"
-          release=$(gh api "repos/${{ github.repository }}/releases" \
-            --jq "[.[] | select(.tag_name == \"${tag}\" and .draft == true)] | first")
+          if ! releases=$(gh api "repos/${GH_REPO}/releases?per_page=100"); then
+            echo "::error::Failed to list releases"
+            exit 1
+          fi
+          release=$(jq --arg tag "${TAG}" \
+            '[.[] | select(.tag_name == $tag and .draft == true)] | first' <<< "${releases}")
           if [[ -z "${release}" || "${release}" == "null" ]]; then
-            echo "Draft release ${tag} not found; nothing to clean up"
+            echo "Draft release ${TAG} not found; nothing to clean up"
             exit 0
           fi
-          release_id=$(echo "${release}" | jq -r '.id')
-          body=$(echo "${release}" | jq -r '.body')
+          release_id=$(jq -r '.id' <<< "${release}")
+          body=$(jq -r '.body' <<< "${release}")
           new_body=$(echo "${body}" \
             | sed '/^> \[!CAUTION\]/,/<!-- ASSETS_PENDING -->/d' \
             | sed 's/<!-- ASSETS_PENDING -->//g' \
@@ -228,11 +255,11 @@ jobs:
           if [[ "${new_body}" != "${body}" ]]; then
             # tag_name and name must be re-sent: updating a draft release
             # without them resets its tag to an untagged-* placeholder.
-            gh api "repos/${{ github.repository }}/releases/${release_id}" \
+            gh api "repos/${GH_REPO}/releases/${release_id}" \
               --method PATCH \
               --field "body=${new_body}" \
-              --field "tag_name=${tag}" \
-              --field "name=${tag}" \
+              --field "tag_name=${TAG}" \
+              --field "name=${TAG}" \
               --field "draft=true" \
               --silent
           fi
