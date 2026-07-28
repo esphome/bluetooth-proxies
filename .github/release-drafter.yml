@@ -2,17 +2,22 @@ name-template: "$RESOLVED_VERSION"
 tag-template: "$RESOLVED_VERSION"
 categories:
   - title: "Breaking Changes"
-    label: "breaking-change"
+    when:
+      label: "breaking-change"
   - title: "New Devices"
-    label: "new-device"
+    when:
+      label: "new-device"
   - title: "Enhancements"
-    label: "enhancement"
+    when:
+      label: "enhancement"
   - title: "Bug Fixes"
-    label: "bugfix"
+    when:
+      label: "bugfix"
   - title: "Dependencies"
     collapse-after: 1
-    labels:
-      - "dependencies"
+    when:
+      labels:
+        - "dependencies"
 
 # Version is calculated externally (calver YY.M.N) and passed in as an input,
 # so the version-resolver here is unused. The workflow overrides
