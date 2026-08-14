@@ -1,0 +1,27 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to publish (defaults to the most recent draft)"
+        required: false
+        type: string
+
+# The called workflow authenticates every step with the ESPHome GitHub App
+# token (via vars.ESPHOME_GITHUB_APP_CLIENT_ID and the inherited
+# ESPHOME_GITHUB_APP_PRIVATE_KEY secret) so that publishing fires a
+# `release: published` event downstream; GITHUB_TOKEN is never used. It also
+# runs in this repo's `release` environment.
+permissions: {}
+
+jobs:
+  release:
+    name: Publish draft release
+    # Patches the draft release's manifest assets with the final release
+    # notes, then publishes it — all by release id, immune to the
+    # draft-by-tag lookup and draft-untagging API pitfalls.
+    uses: esphome/workflows/.github/workflows/publish-draft-release.yml@57a5927f9cdc5da7c40c702403eabeff6ab9856a  # 2026.8.0
+    with:
+      tag: ${{ inputs.tag }}
+    secrets: inherit

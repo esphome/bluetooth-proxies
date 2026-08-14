@@ -1,81 +1,56 @@
 name: Build
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
   workflow_dispatch:
-  release:
-    types: [published]
+  workflow_run:
+    workflows: ["Release Drafter"]
+    types: [completed]
+
+# The called workflow's draft-release jobs (read draft info, replace assets,
+# strip the pending warning) need contents: write; they only run on
+# workflow_run events. Fork pull requests still get a read-only token.
+permissions:
+  contents: write
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name == 'workflow_run' && 'release-drafter' || github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build-generic-firmware:
-    name: Build Generic Firmware
-    uses: esphome/workflows/.github/workflows/build.yml@025a1e6255610c498ed590403b7e510b69e474df  # 2026.4.1
+  build:
+    name: Build to Draft Release
+    # Builds every factory config and, when triggered by a successful Release
+    # Drafter run, uploads the firmware to the current draft release. The
+    # esp32-generic variants are combined into one manifest (their
+    # update.source URLs all point at the single esp32-generic manifest); the
+    # remaining devices each publish their own manifest via the empty-named
+    # group. `groups` requires files to be listed explicitly — it is not
+    # auto-discovered, since discovery would sweep every config into one group.
+    uses: esphome/workflows/.github/workflows/build-to-draft-release.yml@57a5927f9cdc5da7c40c702403eabeff6ab9856a  # 2026.8.0
     with:
-      files: |
-        esp32-generic/esp32-generic.factory.yaml
-        esp32-generic/esp32-generic-c3.factory.yaml
-        esp32-generic/esp32-generic-c6.factory.yaml
-        esp32-generic/esp32-generic-s3.factory.yaml
       esphome-version: 2026.7.4
-      combined-name: esp32-generic
-      release-summary: ${{ github.event_name == 'release' && github.event.release.body || '' }}
-      release-url: ${{ github.event_name == 'release' && github.event.release.html_url || '' }}
-      release-version: ${{ github.event_name == 'release' && github.event.release.tag_name || '' }}
-
-  build-device-firmware:
-    name: Build Device Firmware
-    uses: esphome/workflows/.github/workflows/build.yml@025a1e6255610c498ed590403b7e510b69e474df  # 2026.4.1
-    with:
-      files: |
-        gl-inet/gl-s10.factory.yaml
-        lilygo/lilygo-t-eth-poe.factory.yaml
-        m5stack/m5stack-atom-lite.factory.yaml
-        m5stack/m5stack-atom-s3.factory.yaml
-        olimex/olimex-esp32-poe-iso.factory.yaml
-        seeed/seeed-esp32-poe-factory.yaml
-        wt32/wt32-eth01.factory.yaml
-      esphome-version: 2026.7.4
-      release-summary: ${{ github.event_name == 'release' && github.event.release.body || '' }}
-      release-url: ${{ github.event_name == 'release' && github.event.release.html_url || '' }}
-      release-version: ${{ github.event_name == 'release' && github.event.release.tag_name || '' }}
-
-  upload-to-r2:
-    if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
-    name: Upload to R2
-    needs:
-      - build-generic-firmware
-      - build-device-firmware
-    uses: esphome/workflows/.github/workflows/upload-to-r2.yml@025a1e6255610c498ed590403b7e510b69e474df  # 2026.4.1
-    with:
-      directory: bluetooth-proxy
-    secrets: inherit
-
-  upload-to-release:
-    name: Upload to Release
-    if: github.event_name == 'release'
-    uses: esphome/workflows/.github/workflows/upload-to-gh-release.yml@025a1e6255610c498ed590403b7e510b69e474df  # 2026.4.1
-    needs:
-      - build-generic-firmware
-      - build-device-firmware
-    with:
-      version: ${{ github.event.release.tag_name }}
-
-  promote-prod:
-    name: Promote to Production
-    if: github.event_name == 'release' && github.event.release.prerelease == false
-    uses: esphome/workflows/.github/workflows/promote-r2.yml@025a1e6255610c498ed590403b7e510b69e474df  # 2026.4.1
-    needs:
-      - upload-to-r2
-    with:
-      version: ${{ github.event.release.tag_name }}
-      directory: bluetooth-proxy
-      channel: production
-      manifest-filename: manifest.json
-    secrets: inherit
+      groups: |
+        [
+          {
+            "name": "esp32-generic",
+            "files": [
+              "esp32-generic/esp32-generic.factory.yaml",
+              "esp32-generic/esp32-generic-c3.factory.yaml",
+              "esp32-generic/esp32-generic-c6.factory.yaml",
+              "esp32-generic/esp32-generic-s3.factory.yaml"
+            ]
+          },
+          {
+            "name": "",
+            "files": [
+              "gl-inet/gl-s10.factory.yaml",
+              "lilygo/lilygo-t-eth-poe.factory.yaml",
+              "m5stack/m5stack-atom-lite.factory.yaml",
+              "m5stack/m5stack-atom-s3.factory.yaml",
+              "olimex/olimex-esp32-poe-iso.factory.yaml",
+              "seeed/seeed-esp32-poe.factory.yaml",
+              "wt32/wt32-eth01.factory.yaml"
+            ]
+          }
+        ]
