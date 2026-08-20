@@ -29,7 +29,7 @@ jobs:
     # auto-discovered, since discovery would sweep every config into one group.
     uses: esphome/workflows/.github/workflows/build-to-draft-release.yml@0fdd5e311b7e744069166696072a1a9cbc5fbeb6  # 2026.8.1
     with:
-      esphome-version: 2026.7.4
+      esphome-version: 2026.8.0
       groups: |
         [
           {
