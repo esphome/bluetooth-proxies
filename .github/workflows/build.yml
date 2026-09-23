@@ -27,7 +27,7 @@ jobs:
     # remaining devices each publish their own manifest via the empty-named
     # group. `groups` requires files to be listed explicitly — it is not
     # auto-discovered, since discovery would sweep every config into one group.
-    uses: esphome/workflows/.github/workflows/build-to-draft-release.yml@0fdd5e311b7e744069166696072a1a9cbc5fbeb6  # 2026.8.1
+    uses: esphome/workflows/.github/workflows/build-to-draft-release.yml@cc3e76de337dc59bc1cba8da58d963cd23b873f1  # 2026.9.0
     with:
       esphome-version: 2026.7.4
       groups: |
