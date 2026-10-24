@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   lock:
-    uses: esphome/workflows/.github/workflows/lock.yml@0fdd5e311b7e744069166696072a1a9cbc5fbeb6  # 2026.8.1
+    uses: esphome/workflows/.github/workflows/lock.yml@cc3e76de337dc59bc1cba8da58d963cd23b873f1  # 2026.9.0
     with:
       pr-close-days: 1
       issue-close-days: 1

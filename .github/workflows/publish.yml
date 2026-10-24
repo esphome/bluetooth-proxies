@@ -19,5 +19,5 @@ jobs:
     # non-prerelease). The firmware directory defaults to the repository
     # name singularized (e.g. rf-proxies -> rf-proxy); set a
     # FIRMWARE_DIRECTORY repository variable to override it.
-    uses: esphome/workflows/.github/workflows/publish-firmware-to-r2.yml@0fdd5e311b7e744069166696072a1a9cbc5fbeb6  # 2026.8.1
+    uses: esphome/workflows/.github/workflows/publish-firmware-to-r2.yml@cc3e76de337dc59bc1cba8da58d963cd23b873f1  # 2026.9.0
     secrets: inherit
