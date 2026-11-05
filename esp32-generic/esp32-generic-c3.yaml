@@ -1,6 +1,7 @@
 esphome:
   name: esp32-bluetooth-proxy
   friendly_name: Bluetooth Proxy
+  comment: ${device_description}
   min_version: 2025.8.0
   name_add_mac_suffix: true
 
